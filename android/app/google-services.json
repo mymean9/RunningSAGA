@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "222451467237",
+    "project_id": "running-saga-d07a9",
+    "storage_bucket": "running-saga-d07a9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222451467237:android:e9c7dc7bf67a66e146250c",
+        "android_client_info": {
+          "package_name": "com.runningsaga.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "222451467237-0306kcr9v2jbp9nv1scphtjtfsju31k3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMq73-1CP9DIGL5FBMYiQ464Nzv6aR2JU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "222451467237-0306kcr9v2jbp9nv1scphtjtfsju31k3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
