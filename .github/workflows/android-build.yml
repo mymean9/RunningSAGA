@@ -39,9 +39,13 @@ jobs:
     - name: Build Android App (Debug APK & Release AAB)
       run: |
         cd android
+        # Remove any potential lock files or previous build artifacts
+        rm -rf .gradle build app/build
         chmod +x gradlew
-        ./gradlew assembleDebug
-        ./gradlew bundleRelease
+        # Run clean build
+        ./gradlew clean
+        ./gradlew assembleDebug --stacktrace
+        ./gradlew bundleRelease --stacktrace
 
     - name: Upload Debug APK (For Phone Testing)
       uses: actions/upload-artifact@v4
