@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'NRC-Bold';
+  src: url('https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&display=swap');
+}
+
+@theme {
+  --color-nrc-volt: #CCFF00;
+  --color-nrc-black: #000000;
+  --color-nrc-dark-grey: #111111;
+  --color-nrc-grey: #222222;
+  --font-nrc: 'Inter', system-ui, sans-serif;
+}
+
+:root {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar Nike Style */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #CCFF00;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #e6ff00;
+}
+
+/* Utilities */
+.text-volt {
+  color: #CCFF00;
+}
+.bg-volt {
+  background-color: #CCFF00;
+}
+.border-volt {
+  border-color: #CCFF00;
+}

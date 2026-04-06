@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Running SAGA - Wind & Wings 32px Preview</title>
+    <style>
+        body {
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+        .container {
+            display: flex;
+            gap: 60px;
+            align-items: center;
+        }
+        .zoom-box {
+            text-align: center;
+        }
+        .icon-box {
+            background: #CCFF00;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .large { width: 160px; height: 160px; padding: 10px; }
+        .target-32 { width: 32px; height: 32px; padding: 3px; }
+        
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+        .label {
+            color: #fff;
+            margin-top: 15px;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Zoomed Preview -->
+        <div class="zoom-box">
+            <div class="icon-box large">
+                <!-- Wind & Wings Logo v10 (Restored) -->
+                <svg viewBox="20 10 220 110" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 100 L70 30 Q80 20 105 20 Q130 20 125 50 Q120 75 90 75 L120 105" 
+                          stroke="#000" stroke-width="20" fill="none" stroke-linecap="butt" stroke-linejoin="miter"/>
+                    <!-- Wind -->
+                    <path d="M35 40 Q20 45 45 50" stroke="#000" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.8"/>
+                    <path d="M30 60 Q15 65 40 70" stroke="#000" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.6"/>
+                    
+                    <!-- S Wings -->
+                    <path d="M140 35 C180 15 200 55 170 65 C140 75 155 105 195 95" 
+                          stroke="#000" stroke-width="22" fill="none" stroke-linecap="butt" stroke-linejoin="miter"/>
+                    <path d="M190 30 L225 15 L200 40 Z" fill="#000" />
+                    <path d="M195 50 L230 40 L205 60 Z" fill="#000" />
+                    <path d="M200 70 L225 65 L208 80 Z" fill="#000" />
+                </svg>
+            </div>
+            <p class="label">WIND & WINGS (ORIGINAL)</p>
+        </div>
+
+        <!-- 32px Target Preview -->
+        <div class="zoom-box">
+            <div class="icon-box target-32">
+                <svg viewBox="20 10 220 110" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 100 L70 30 Q80 20 105 20 Q130 20 125 50 Q120 75 90 75 L120 105" 
+                          stroke="#000" stroke-width="20" fill="none" stroke-linecap="butt" stroke-linejoin="miter"/>
+                    <path d="M35 40 Q20 45 45 50" stroke="#000" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.8"/>
+                    <path d="M30 60 Q15 65 40 70" stroke="#000" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.6"/>
+                    <path d="M140 35 C180 15 200 55 170 65 C140 75 155 105 195 95" 
+                          stroke="#000" stroke-width="22" fill="none" stroke-linecap="butt" stroke-linejoin="miter"/>
+                    <path d="M190 30 L225 15 L200 40 Z" fill="#000" />
+                    <path d="M195 50 L230 40 L205 60 Z" fill="#000" />
+                    <path d="M200 70 L225 65 L208 80 Z" fill="#000" />
+                </svg>
+            </div>
+            <p class="label">FAVICON (32PX)</p>
+        </div>
+    </div>
+</body>
+</html>
