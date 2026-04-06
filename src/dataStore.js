@@ -1,7 +1,9 @@
 import { reactive, watch } from 'vue';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, writeBatch, getDoc, deleteDoc } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithCredential } from 'firebase/auth';
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCHX3gxS3eo_1TDDXFmz2RmgvAmnEyA7R0",
@@ -86,38 +88,49 @@ export const store = reactive({
   },
 
   async loginWithGoogle() {
-    this.loading = true;
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const fbUser = result.user;
-      const profileRef = doc(db, 'runners', fbUser.uid);
-      const snap = await getDoc(profileRef);
-      if (!snap.exists()) {
-        // Try email-based migration first
-        await this._loadUserProfile(fbUser.uid, fbUser.email);
-        if (!this.user) {
-          const newProfile = {
-            id: fbUser.uid, uid: fbUser.uid,
-            email: fbUser.email,
-            name: (fbUser.displayName || fbUser.email.split('@')[0]).toUpperCase(),
-            groupId: null,
-            distance: 0, runs: 0,
-            pace: "0'00\"",
-            progress: 0,
-            lastImage: null,
-            activities: []
-          };
-          await setDoc(profileRef, newProfile);
-          this.user = newProfile;
+      this.loading = true;
+      try {
+        let fbUser = null;
+
+        if (Capacitor.isNativePlatform()) {
+          // Native Google Login for Android/iOS
+          const result = await FirebaseAuthentication.signInWithGoogle();
+          const credential = GoogleAuthProvider.credential(result.idToken);
+          const cred = await signInWithCredential(auth, credential);
+          fbUser = cred.user;
+        } else {
+          // Web Google Login (Browser)
+          const result = await signInWithPopup(auth, googleProvider);
+          fbUser = result.user;
         }
-      } else {
-        this.user = snap.data();
+
+        const profileRef = doc(db, 'runners', fbUser.uid);
+        const snap = await getDoc(profileRef);
+        if (!snap.exists()) {
+          await this._loadUserProfile(fbUser.uid, fbUser.email);
+          if (!this.user) {
+            const newProfile = {
+              id: fbUser.uid, uid: fbUser.uid,
+              email: fbUser.email,
+              name: (fbUser.displayName || fbUser.email.split('@')[0]).toUpperCase(),
+              groupId: null,
+              distance: 0, runs: 0,
+              pace: "0'00\"",
+              progress: 0,
+              lastImage: null,
+              activities: []
+            };
+            await setDoc(profileRef, newProfile);
+            this.user = newProfile;
+          }
+        } else {
+          this.user = snap.data();
+        }
+      } catch(e) {
+        alert('GOOGLE LOGIN ERROR: ' + e.message);
       }
-    } catch(e) {
-      alert('GOOGLE LOGIN ERROR: ' + e.message);
-    }
-    this.loading = false;
-  },
+      this.loading = false;
+    },
 
   async _loadUserProfile(uid, email = null) {
     // 1. Try to find by UID first (normal case)
