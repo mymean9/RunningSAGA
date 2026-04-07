@@ -95,7 +95,7 @@ export const store = reactive({
         if (Capacitor.isNativePlatform()) {
           // Native Google Login for Android/iOS
           const result = await FirebaseAuthentication.signInWithGoogle({
-            webClientId: '222451467237-9ht2dsk79hdv80hram12ibvggosm32s5.apps.googleusercontent.com'
+            webClientId: '222451467237-0306kcr9v2jbp9nv1scphtjtfsju31k3.apps.googleusercontent.com'
           });
           
           if (!result.idToken) {
