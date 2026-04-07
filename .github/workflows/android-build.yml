@@ -53,14 +53,19 @@ jobs:
       id: date
       run: echo "date=$(date +'%Y%m%d_%H%M')" >> $GITHUB_OUTPUT
 
+    - name: Rename APK and AAB files
+      run: |
+        mv android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/runningsaga_${{ steps.date.outputs.date }}.apk
+        mv android/app/build/outputs/bundle/release/app-release.aab android/app/build/outputs/bundle/release/runningsaga_${{ steps.date.outputs.date }}.aab
+
     - name: Upload Debug APK (For Phone Testing)
       uses: actions/upload-artifact@v4
       with:
-        name: runningsaga_${{ steps.date.outputs.date }}.apk
-        path: android/app/build/outputs/apk/debug/app-debug.apk
+        name: runningsaga-apk-${{ steps.date.outputs.date }}
+        path: android/app/build/outputs/apk/debug/runningsaga_${{ steps.date.outputs.date }}.apk
 
     - name: Upload Release AAB (For Play Store)
       uses: actions/upload-artifact@v4
       with:
-        name: runningsaga_${{ steps.date.outputs.date }}.aab
-        path: android/app/build/outputs/bundle/release/app-release.aab
+        name: runningsaga-aab-${{ steps.date.outputs.date }}
+        path: android/app/build/outputs/bundle/release/runningsaga_${{ steps.date.outputs.date }}.aab
