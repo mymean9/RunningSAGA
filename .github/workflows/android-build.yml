@@ -51,7 +51,9 @@ jobs:
 
     - name: Get current date and time
       id: date
-      run: echo "date=$(date +'%Y%m%d_%H%M')" >> $GITHUB_OUTPUT
+      run: |
+        export TZ="Asia/Seoul"
+        echo "date=$(date +'%Y%m%d_%H%M')" >> $GITHUB_OUTPUT
 
     - name: Rename APK and AAB files
       run: |
