@@ -42,11 +42,11 @@ jobs:
         # Remove any potential lock files or previous build artifacts
         rm -rf .gradle build app/build
         chmod +x gradlew
-        # View signing report to get SHA-1
-        ./gradlew signingReport
         # Run clean build
         ./gradlew clean
         ./gradlew assembleDebug --stacktrace
+        # View signing report to get SHA-1 after build
+        ./gradlew signingReport
         ./gradlew bundleRelease --stacktrace
 
     - name: Get current date and time
