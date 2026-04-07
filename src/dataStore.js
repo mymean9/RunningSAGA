@@ -94,7 +94,9 @@ export const store = reactive({
 
         if (Capacitor.isNativePlatform()) {
           // Native Google Login for Android/iOS
-          const result = await FirebaseAuthentication.signInWithGoogle();
+          const result = await FirebaseAuthentication.signInWithGoogle({
+            webClientId: '222451467237-0306kcr9v2jbp9nv1scphtjtfsju31k3.apps.googleusercontent.com'
+          });
           const credential = GoogleAuthProvider.credential(result.idToken);
           const cred = await signInWithCredential(auth, credential);
           fbUser = cred.user;
@@ -127,7 +129,10 @@ export const store = reactive({
           this.user = snap.data();
         }
       } catch(e) {
-        alert('GOOGLE LOGIN ERROR: ' + e.message);
+        console.error('GOOGLE LOGIN ERROR:', e);
+        const errorMessage = e.message || 'Unknown error';
+        const errorCode = e.code || 'N/A';
+        alert(`GOOGLE LOGIN ERROR (Code: ${errorCode}): ${errorMessage}`);
       }
       this.loading = false;
     },
