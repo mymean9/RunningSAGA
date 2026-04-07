@@ -134,10 +134,11 @@ export const store = reactive({
           this.user = snap.data();
         }
       } catch(e) {
-        console.error('GOOGLE LOGIN ERROR:', e);
+        console.error('FULL GOOGLE LOGIN ERROR:', e);
+        const errorJson = JSON.stringify(e, Object.getOwnPropertyNames(e), 2);
         const errorMessage = e.message || 'Unknown error';
         const errorCode = e.code || 'N/A';
-        alert(`GOOGLE LOGIN ERROR (Code: ${errorCode}): ${errorMessage}`);
+        alert(`GOOGLE LOGIN ERROR (Code: ${errorCode})\n\nMessage: ${errorMessage}\n\nFull Detail: ${errorJson}`);
       }
       this.loading = false;
     },
