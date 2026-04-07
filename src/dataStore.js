@@ -97,6 +97,11 @@ export const store = reactive({
           const result = await FirebaseAuthentication.signInWithGoogle({
             webClientId: '222451467237-0306kcr9v2jbp9nv1scphtjtfsju31k3.apps.googleusercontent.com'
           });
+          
+          if (!result.idToken) {
+            throw new Error(`Google Sign-In failed: idToken is missing. Check your Firebase SHA-1 and Client ID config.`);
+          }
+
           const credential = GoogleAuthProvider.credential(result.idToken);
           const cred = await signInWithCredential(auth, credential);
           fbUser = cred.user;
