@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "222451467237-9ht2dsk79hdv80hram12ibvggosm32s5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.runningsaga.app",
+            "certificate_hash": "365203006514b780884e28cc040b1ef33ee88906"
+          }
+        },
+        {
           "client_id": "222451467237-0306kcr9v2jbp9nv1scphtjtfsju31k3.apps.googleusercontent.com",
           "client_type": 3
         }
