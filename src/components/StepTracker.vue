@@ -276,7 +276,17 @@ const requestPermission = async () => {
        }
     }
     
-    // 2. Motion / Sensor Permission (Mainly for iOS, but good for Android webview)
+    // 2. Notification Permission (Required for Android 13+ to show Background Notification)
+    // We can use a try-catch for platforms that don't support it
+    try {
+      if ('Notification' in window && Notification.permission !== 'granted') {
+        await Notification.requestPermission();
+      }
+    } catch (e) {
+      console.warn("Notification permission request not supported in this environment");
+    }
+
+    // 3. Motion / Sensor Permission (Mainly for iOS, but good for Android webview)
     if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
       const motionRes = await DeviceMotionEvent.requestPermission();
       if (motionRes !== 'granted') {
