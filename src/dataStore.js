@@ -88,45 +88,60 @@ export const store = reactive({
   },
 
   async loginWithGoogle() {
-      this.loading = true;
-      try {
-        let fbUser = null;
+    this.loading = true;
+    try {
+      let fbUser = null;
 
-        // Bypass native login and use Web-based flow even on mobile to avoid signature/credential issues
+      if (Capacitor.isNativePlatform()) {
+        // Native Google Login for Android/iOS
+        const result = await FirebaseAuthentication.signInWithGoogle();
+        
+        if (!result.idToken) {
+          throw new Error(`Google Sign-In failed: idToken is missing. Check your Firebase SHA-1 and Client ID config.`);
+        }
+
+        const credential = GoogleAuthProvider.credential(result.idToken);
+        const cred = await signInWithCredential(auth, credential);
+        fbUser = cred.user;
+      } else {
+        // Web Google Login (Browser)
         const result = await signInWithPopup(auth, googleProvider);
         fbUser = result.user;
-
-        const profileRef = doc(db, 'runners', fbUser.uid);
-        const snap = await getDoc(profileRef);
-        if (!snap.exists()) {
-          await this._loadUserProfile(fbUser.uid, fbUser.email);
-          if (!this.user) {
-            const newProfile = {
-              id: fbUser.uid, uid: fbUser.uid,
-              email: fbUser.email,
-              name: (fbUser.displayName || fbUser.email.split('@')[0]).toUpperCase(),
-              groupId: null,
-              distance: 0, runs: 0,
-              pace: "0'00\"",
-              progress: 0,
-              lastImage: null,
-              activities: []
-            };
-            await setDoc(profileRef, newProfile);
-            this.user = newProfile;
-          }
-        } else {
-          this.user = snap.data();
-        }
-      } catch(e) {
-        console.error('FULL GOOGLE LOGIN ERROR:', e);
-        const errorJson = JSON.stringify(e, Object.getOwnPropertyNames(e), 2);
-        const errorMessage = e.message || 'Unknown error';
-        const errorCode = e.code || 'N/A';
-        alert(`GOOGLE LOGIN ERROR (Code: ${errorCode})\n\nMessage: ${errorMessage}\n\nFull Detail: ${errorJson}`);
       }
+
+      const profileRef = doc(db, 'runners', fbUser.uid);
+      const snap = await getDoc(profileRef);
+      
+      if (!snap.exists()) {
+        await this._loadUserProfile(fbUser.uid, fbUser.email);
+        if (!this.user) {
+          const newProfile = {
+            id: fbUser.uid, uid: fbUser.uid,
+            email: fbUser.email,
+            name: (fbUser.displayName || fbUser.email.split('@')[0]).toUpperCase(),
+            groupId: null,
+            distance: 0, runs: 0,
+            pace: "0'00\"",
+            progress: 0,
+            lastImage: null,
+            activities: []
+          };
+          await setDoc(profileRef, newProfile);
+          this.user = newProfile;
+        }
+      } else {
+        this.user = snap.data();
+      }
+    } catch(e) {
+      console.error('FULL GOOGLE LOGIN ERROR:', e);
+      const errorJson = JSON.stringify(e, Object.getOwnPropertyNames(e), 2);
+      const errorMessage = e.message || 'Unknown error';
+      const errorCode = e.code || 'N/A';
+      alert(`GOOGLE LOGIN ERROR (Code: ${errorCode})\n\nMessage: ${errorMessage}\n\nFull Detail: ${errorJson}`);
+    } finally {
       this.loading = false;
-    },
+    }
+  },
 
   async _loadUserProfile(uid, email = null) {
     // 1. Try to find by UID first (normal case)
