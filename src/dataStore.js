@@ -94,7 +94,9 @@ export const store = reactive({
 
       if (Capacitor.isNativePlatform()) {
         // Native Google Login for Android/iOS
-        const result = await FirebaseAuthentication.signInWithGoogle();
+        const result = await FirebaseAuthentication.signInWithGoogle({
+          webClientId: '222451467237-0306kcr9v2jbp9nv1scphtjtfsju31k3.apps.googleusercontent.com'
+        });
         
         if (!result.idToken) {
           throw new Error(`Google Sign-In failed: idToken is missing. Check your Firebase SHA-1 and Client ID config.`);
