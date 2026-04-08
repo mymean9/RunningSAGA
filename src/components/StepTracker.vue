@@ -164,6 +164,8 @@ import html2canvas from 'html2canvas';
 // Capacitor Native Plugins
 import { Geolocation } from '@capacitor/geolocation';
 import { Motion } from '@capacitor/motion';
+import { registerPlugin } from '@capacitor/core';
+const BackgroundGeolocation = registerPlugin('BackgroundGeolocation');
 
 const props = defineProps({
   currentUser: Object
@@ -368,20 +370,26 @@ const startTracking = async () => {
 
   await nextTick();
   
-  // Capacitor Native Geolocation Tracking
+  // Capacitor Native Geolocation Tracking (Now using Background-capable watcher)
   if (!watchId) {
-    watchId = await Geolocation.watchPosition(
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
+    watchId = await BackgroundGeolocation.addWatcher(
+      { 
+        backgroundTitle: "SAGA RUNNING TRACKER",
+        backgroundMessage: "RUNNING SAGA IS RECORDING YOUR RUN...",
+        requestPermissions: true,
+        stale: false,
+        distanceFilter: 5 // Record Every 5 meters change
+      },
       (pos, err) => {
         if (err) {
-          console.log("GPS Error:", err);
+          console.error("Background GPS Error:", err);
           return;
         }
         if (!pos) return;
 
-        const { latitude, longitude, accuracy } = pos.coords;
+        const { latitude, longitude, accuracy } = pos;
         
-        // [오차 필터링] 오차가 25m 이상인 부정확한(Jitter) GPS 데이터는 완전히 버립니다.
+        // [오차 필터링] 오차가 25m 이상인 부정확한 데이터 무시
         if (accuracy > 25) {
           console.warn(`GPS 튐 무시됨: 오차 반경 ${accuracy.toFixed(1)}m`);
           return;
@@ -410,8 +418,7 @@ const startTracking = async () => {
             fillOpacity: 1
           }).addTo(map);
           
-          // Force Leaflet to recalculate size in case DOM was shifting
-          setTimeout(() => { map.invalidateSize(); }, 200);
+          setTimeout(() => { if(map) map.invalidateSize(); }, 200);
         } else if (map) {
           polyline.setLatLngs(routeCoordinates.value);
           marker.setLatLng(newPoint);
@@ -436,7 +443,7 @@ const stopTracking = () => {
   }
   
   if (watchId) {
-    Geolocation.clearWatch({ id: watchId });
+    BackgroundGeolocation.removeWatcher({ id: watchId });
     watchId = null;
   }
 };
