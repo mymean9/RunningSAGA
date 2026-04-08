@@ -92,22 +92,9 @@ export const store = reactive({
       try {
         let fbUser = null;
 
-        if (Capacitor.isNativePlatform()) {
-          // Native Google Login for Android/iOS
-          const result = await FirebaseAuthentication.signInWithGoogle();
-          
-          if (!result.idToken) {
-            throw new Error(`Google Sign-In failed: idToken is missing. Check your Firebase SHA-1 and Client ID config.`);
-          }
-
-          const credential = GoogleAuthProvider.credential(result.idToken);
-          const cred = await signInWithCredential(auth, credential);
-          fbUser = cred.user;
-        } else {
-          // Web Google Login (Browser)
-          const result = await signInWithPopup(auth, googleProvider);
-          fbUser = result.user;
-        }
+        // Bypass native login and use Web-based flow even on mobile to avoid signature/credential issues
+        const result = await signInWithPopup(auth, googleProvider);
+        fbUser = result.user;
 
         const profileRef = doc(db, 'runners', fbUser.uid);
         const snap = await getDoc(profileRef);
