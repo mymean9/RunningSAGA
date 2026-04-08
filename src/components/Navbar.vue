@@ -1,3 +1,4 @@
+<template>
   <!-- TOP HEADER (Logo & Profile) -->
   <nav class="sticky top-0 z-40 bg-[#000000]/95 backdrop-blur-md border-b border-volt/10 px-6 py-4">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
@@ -71,19 +72,19 @@
         <!-- User info -->
         <div class="p-8 border-b border-[#1a1a1a]">
           <p class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">RUNNER</p>
-          <h2 class="text-4xl font-black italic text-white uppercase tracking-tighter leading-none">{{ user.name }}</h2>
-          <p class="text-sm text-white/40 mt-2">{{ user.email }}</p>
+          <h2 class="text-4xl font-black italic text-white uppercase tracking-tighter leading-none">{{ user?.name }}</h2>
+          <p class="text-sm text-white/40 mt-2">{{ user?.email }}</p>
         </div>
 
         <!-- Stats -->
         <div class="p-8 border-b border-[#1a1a1a] grid grid-cols-2 gap-6">
           <div>
             <p class="text-[10px] font-bold text-white/30 uppercase tracking-widest">TOTAL DISTANCE</p>
-            <p class="text-3xl font-black italic text-volt mt-1">{{ user.distance?.toFixed(1) || '0.0' }} <span class="text-sm">KM</span></p>
+            <p class="text-3xl font-black italic text-volt mt-1">{{ user?.distance?.toFixed(1) || '0.0' }} <span class="text-sm">KM</span></p>
           </div>
           <div>
             <p class="text-[10px] font-bold text-white/30 uppercase tracking-widest">SESSIONS</p>
-            <p class="text-3xl font-black italic text-white mt-1">{{ user.runs || 0 }}</p>
+            <p class="text-3xl font-black italic text-white mt-1">{{ user?.runs || 0 }}</p>
           </div>
         </div>
 
@@ -174,8 +175,4 @@ const doLogout = () => {
 .drawer-enter-from > div, .drawer-leave-to > div {
   transform: translateX(100%);
 }
-</style>
-
-
-<style scoped>
 </style>
