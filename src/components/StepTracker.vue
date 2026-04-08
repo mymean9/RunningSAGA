@@ -262,17 +262,36 @@ const handleMotion = (event) => {
 };
 
 const requestPermission = async () => {
-  // 앱(Capacitor) 환경에서는 권한이 필요한 경우 자동으로 요청하거나 명시적으로 요청 가능
   try {
-    // Geolocation 권한 확인 및 요청
+    // 1. Geolocation Permission
     const geoStatus = await Geolocation.checkPermissions();
+    console.log('Current Geo Status:', geoStatus);
+
     if (geoStatus.location !== 'granted') {
-       await Geolocation.requestPermissions();
+       const requestRes = await Geolocation.requestPermissions();
+       if (requestRes.location !== 'granted') {
+         throw new Error('LOCATION_PERMISSION_DENIED');
+       }
     }
+    
+    // 2. Motion / Sensor Permission (Mainly for iOS, but good for Android webview)
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+      const motionRes = await DeviceMotionEvent.requestPermission();
+      if (motionRes !== 'granted') {
+        throw new Error('MOTION_PERMISSION_DENIED');
+      }
+    }
+
     startTracking();
   } catch (error) {
     console.error('Error requesting permission:', error);
-    alert('SENSOR/GPS ACCESS DENIED. PLEASE ENABLE IN SETTINGS.');
+    let msg = 'SENSOR/GPS ACCESS DENIED.';
+    if (error.message === 'LOCATION_PERMISSION_DENIED') {
+      msg = 'GPS/LOCATION ACCESS IS REQUIRED TO TRACK YOUR RUN. PLEASE ENABLE IN SETTINGS.';
+    } else if (error.message === 'MOTION_PERMISSION_DENIED') {
+      msg = 'MOTION SENSOR ACCESS IS REQUIRED FOR THE STEP COUNTER. PLEASE ENABLE IN SETTINGS.';
+    }
+    alert(msg);
   }
 };
 
