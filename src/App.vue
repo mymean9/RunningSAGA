@@ -15,7 +15,7 @@
         @logout="handleLogout"
         @changeTab="(tab) => activeTab = tab"
       />
-      <main class="relative">
+      <main class="relative pb-24 md:pb-0">
         <Transition name="fade" mode="out-in">
           <component
             :is="activeTab === 'dashboard' ? Dashboard : (activeTab === 'tracker' ? Tracker : (activeTab === 'ranking' ? Ranking : Statistics))"

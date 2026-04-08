@@ -1,23 +1,18 @@
-<template>
-  <nav class="sticky top-0 z-50 bg-[#000000]/95 backdrop-blur-md border-b border-volt/10 px-6 py-4">
+  <!-- TOP HEADER (Logo & Profile) -->
+  <nav class="sticky top-0 z-40 bg-[#000000]/95 backdrop-blur-md border-b border-volt/10 px-6 py-4">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <!-- LOGO -->
       <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-volt rounded-sm p-1">
+        <div class="w-8 h-8 flex items-center justify-center bg-volt rounded-sm p-1">
            <svg viewBox="20 10 220 110" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-black">
               <path d="M50 100 L70 30 Q80 20 105 20 Q130 20 125 50 Q120 75 90 75 L120 105" stroke="currentColor" stroke-width="20" fill="none" stroke-linecap="butt" stroke-linejoin="miter"/>
-              <path d="M35 40 Q20 45 45 50" stroke="currentColor" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.8"/>
-              <path d="M30 60 Q15 65 40 70" stroke="currentColor" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.6"/>
               <path d="M140 35 C180 15 200 55 170 65 C140 75 155 105 195 95" stroke="currentColor" stroke-width="22" fill="none" stroke-linecap="butt" stroke-linejoin="miter"/>
-              <path d="M190 30 L225 15 L200 40 Z" fill="currentColor" />
-              <path d="M195 50 L230 40 L205 60 Z" fill="currentColor" />
-              <path d="M200 70 L225 65 L208 80 Z" fill="currentColor" />
            </svg>
         </div>
-        <span class="text-lg md:text-xl font-black italic tracking-tighter uppercase text-white">RUNNING <span class="text-volt">SAGA</span></span>
+        <span class="text-lg font-black italic tracking-tighter uppercase text-white">RUNNING <span class="text-volt">SAGA</span></span>
       </div>
       
-      <!-- DESKTOP NAV LINKS -->
+      <!-- DESKTOP NAV LINKS (Hidden on Mobile) -->
       <div class="hidden md:flex items-center space-x-12">
         <button 
           v-for="tab in tabs" 
@@ -29,79 +24,36 @@
         </button>
       </div>
 
-      <!-- RIGHT SECTION (DESKTOP USER INFO & HAMBURGER) -->
-      <div class="flex items-center space-x-6">
-        <!-- Desktop User Info -->
-        <div v-if="user" class="hidden md:flex items-center space-x-4">
-          <button @click="isProfileOpen = !isProfileOpen" class="text-right hover:opacity-70 transition-opacity cursor-pointer">
-             <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest leading-none">SIGNED IN AS</p>
-             <p class="text-xs font-black italic text-volt uppercase leading-tight flex items-center justify-end">
-               {{ user.name || user.email }}
-               <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="ml-1 opacity-50"><polyline points="6 9 12 15 18 9"></polyline></svg>
-             </p>
-          </button>
-        </div>
-        
-        <button 
-          v-else-if="!user"
-          @click="$emit('openAuth')"
-          class="hidden md:block border-2 border-volt px-4 py-1.5 text-volt text-xs font-black italic uppercase tracking-widest hover:bg-volt hover:text-black transition-all transform active:scale-95"
-        >
-          LOGIN / JOIN
+      <!-- PROFILE ACCESS -->
+      <div class="flex items-center space-x-4">
+        <button v-if="user" @click="isProfileOpen = !isProfileOpen" class="w-8 h-8 rounded-full bg-[#111] border border-volt/30 flex items-center justify-center text-volt hover:bg-volt hover:text-black transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </button>
-
-        <!-- HAMBURGER BUTTON -->
-        <button 
-          @click="isMenuOpen = !isMenuOpen"
-          class="md:hidden text-white p-2 focus:outline-none"
-        >
-          <svg v-if="!isMenuOpen" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button v-else @click="$emit('openAuth')" class="text-[10px] font-black italic text-volt border border-volt px-3 py-1 uppercase tracking-widest hover:bg-volt hover:text-black transition-all">
+          LOGIN
         </button>
       </div>
     </div>
-
-    <!-- MOBILE MENU OVERLAY -->
-    <transition
-      enter-active-class="transition-all duration-300 ease-out"
-      enter-from-class="opacity-0 -translate-y-4"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition-all duration-200 ease-in"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 -translate-y-4"
-    >
-      <div v-if="isMenuOpen" class="md:hidden mt-4 pt-4 border-t border-volt/10 space-y-6">
-        <div class="flex flex-col space-y-4 px-2">
-          <button 
-            v-for="tab in tabs" 
-            :key="tab.id"
-            @click="handleTabChange(tab.id)"
-            :class="[activeTab === tab.id ? 'text-volt' : 'text-white/60', 'text-lg font-black italic uppercase tracking-[0.2em] text-left transition-all']"
-          >
-            {{ tab.name }}
-          </button>
-        </div>
-
-        <div class="pt-4 border-t border-volt/10 px-2 space-y-4">
-          <div v-if="user" class="flex flex-col items-start">
-             <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest leading-none">SIGNED IN AS</p>
-             <p class="text-sm font-black italic text-volt uppercase leading-tight mt-1">{{ user.name || user.email }}</p>
-             <button @click="$emit('logout'); isMenuOpen = false" class="mt-4 text-xs font-bold text-white/60 hover:text-white uppercase tracking-widest flex items-center">
-                LOGOUT
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-             </button>
-          </div>
-          <button 
-            v-else
-            @click="$emit('openAuth'); isMenuOpen = false"
-            class="w-full border-2 border-volt py-3 text-volt text-sm font-black italic uppercase tracking-widest active:bg-volt active:text-black transition-all"
-          >
-            LOGIN / JOIN
-          </button>
-        </div>
-      </div>
-    </transition>
   </nav>
+
+  <!-- MOBILE BOTTOM TAB BAR (Visible only on Mobile) -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-black/95 backdrop-blur-xl border-t border-white/5 px-4 pb-safe">
+    <div class="flex justify-around items-center h-16">
+      <button 
+        v-for="tab in tabs" 
+        :key="tab.id"
+        @click="$emit('changeTab', tab.id)"
+        class="flex flex-col items-center justify-center space-y-1 transition-all duration-300 active:scale-90"
+        :class="activeTab === tab.id ? 'text-volt' : 'text-white/40'"
+      >
+        <div class="relative">
+          <component :is="tab.icon" class="w-5 h-5" />
+          <div v-if="activeTab === tab.id" class="absolute -top-1 -right-1 w-1.5 h-1.5 bg-volt rounded-full shadow-[0_0_8px_#CEFF00]"></div>
+        </div>
+        <span class="text-[8px] font-black italic uppercase tracking-widest">{{ tab.name }}</span>
+      </button>
+    </div>
+  </div>
 
   <!-- PROFILE DRAWER OVERLAY -->
   <Transition name="drawer">
@@ -177,11 +129,25 @@ const myGroup = computed(() => {
   return store.groups.find(g => g.id === props.user.groupId);
 });
 
+// Inline Icon Components
+const IconDashboard = {
+  template: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`
+};
+const IconTracker = {
+  template: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10l4.5 4.5"></path><circle cx="12" cy="12" r="10"></circle></svg>`
+};
+const IconRanking = {
+  template: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`
+};
+const IconStatistics = {
+  template: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>`
+};
+
 const tabs = [
-  { id: 'dashboard', name: 'DASHBOARD' },
-  { id: 'tracker', name: 'TRACKER' },
-  { id: 'ranking', name: 'RANKING' },
-  { id: 'statistics', name: 'STATISTICS' }
+  { id: 'dashboard', name: 'HOME', icon: IconDashboard },
+  { id: 'tracker', name: 'TRACK', icon: IconTracker },
+  { id: 'ranking', name: 'RANK', icon: IconRanking },
+  { id: 'statistics', name: 'STATS', icon: IconStatistics }
 ];
 
 const handleTabChange = (tabId) => {

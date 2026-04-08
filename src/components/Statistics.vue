@@ -92,19 +92,83 @@
       </div>
 
       <!-- Tribe Participation Chart Simulation -->
-      <div class="mt-12 bg-[#0a0a0a] border border-white/5 p-8 rounded-sm">
+      <div class="mt-8 bg-[#0a0a0a] border border-white/5 p-6 rounded-sm">
+         <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xs font-black italic uppercase tracking-[0.4em] text-white">TRIBE ACTIVITY (LAST 7 DAYS)</h3>
+            <span class="text-[10px] font-bold text-volt uppercase tracking-widest">{{ weeklyTotal.toFixed(1) }} KM TOTAL</span>
+         </div>
+         
+         <!-- SVG CHART -->
+         <div class="w-full h-48 relative mb-4">
+            <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 700 200">
+               <!-- Grid lines -->
+               <line x1="0" y1="0" x2="700" y2="0" stroke="white" stroke-width="0.5" stroke-dasharray="4" opacity="0.1" />
+               <line x1="0" y1="50" x2="700" y2="50" stroke="white" stroke-width="0.5" stroke-dasharray="4" opacity="0.1" />
+               <line x1="0" y1="100" x2="700" y2="100" stroke="white" stroke-width="0.5" stroke-dasharray="4" opacity="0.1" />
+               <line x1="0" y1="150" x2="700" y2="150" stroke="white" stroke-width="0.5" stroke-dasharray="4" opacity="0.1" />
+               
+               <!-- Area path -->
+               <path 
+                  :d="chartPathArea" 
+                  fill="url(#chartGradient)" 
+                  fill-opacity="0.3"
+                  class="transition-all duration-1000"
+               />
+
+               <!-- Line path -->
+               <path 
+                  :d="chartPathLine" 
+                  fill="none" 
+                  stroke="#CEFF00" 
+                  stroke-width="4" 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round"
+                  class="transition-all duration-1000"
+                  style="filter: drop-shadow(0 0 8px rgba(206, 255, 0, 0.4))"
+               />
+
+               <!-- Points -->
+               <g v-for="(point, i) in chartPoints" :key="i">
+                  <circle 
+                    :cx="point.x" 
+                    :cy="point.y" 
+                    r="4" 
+                    fill="#000" 
+                    stroke="#CEFF00" 
+                    stroke-width="3"
+                  />
+               </g>
+
+               <!-- Gradient Definition -->
+               <defs>
+                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                     <stop offset="0%" stop-color="#CEFF00" />
+                     <stop offset="100%" stop-color="#CEFF00" stop-opacity="0" />
+                  </linearGradient>
+               </defs>
+            </svg>
+         </div>
+         
+         <!-- Chart Labels -->
+         <div class="flex justify-between px-1">
+            <span v-for="(day, i) in weekLabels" :key="i" class="text-[8px] font-bold text-white/30 uppercase tracking-tighter">{{ day }}</span>
+         </div>
+      </div>
+
+      <!-- Individual Distribution -->
+      <div class="mt-8 bg-[#0a0a0a] border border-white/5 p-6 rounded-sm">
          <div class="flex justify-between items-center mb-8">
-            <h3 class="text-xs font-black italic uppercase tracking-[0.4em] text-white">INDIVIDUAL CONTRIBUTION STAKES</h3>
-            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest">RANKED BY DISTANCE %</span>
+            <h3 class="text-xs font-black italic uppercase tracking-[0.4em] text-white">INDIVIDUAL STAKES</h3>
+            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest">BY DISTANCE %</span>
          </div>
          <div class="space-y-6">
             <div v-for="runner in sortedByDist" :key="runner.name" class="relative">
                <div class="flex justify-between items-center mb-1">
                   <span class="text-[10px] font-black italic text-white/60 uppercase tracking-widest">{{ runner.name }}</span>
-                  <span class="text-[10px] font-black italic text-volt">{{ ((runner.distance / totalDistance) * 100).toFixed(1) }}% share</span>
+                  <span class="text-[10px] font-black italic text-volt">{{ ((runner.distance / (totalDistance || 1)) * 100).toFixed(1) }}%</span>
                </div>
                <div class="h-1 bg-[#222222] overflow-hidden">
-                  <div class="h-full bg-volt opacity-50 transition-all duration-1000" :style="{ width: `${(runner.distance / totalDistance) * 100}%` }"></div>
+                  <div class="h-full bg-volt opacity-50 transition-all duration-1000" :style="{ width: `${(runner.distance / (totalDistance || 1)) * 100}%` }"></div>
                </div>
             </div>
          </div>
@@ -124,15 +188,68 @@ const props = defineProps({
 });
 
 const totalDistance = computed(() => {
-  return store.runners.reduce((acc, r) => acc + r.distance, 0);
+  return store.runners.reduce((acc, r) => acc + (r.distance || 0), 0);
 });
 
 const goalProgress = computed(() => {
-  return Math.min(100, (totalDistance.value / GRAND_GOAL) * 100);
+  return Math.min(100, (totalDistance.value / (GRAND_GOAL || 1)) * 100);
+});
+
+// WEEKLY CHART LOGIC
+const weekLabels = computed(() => {
+  const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  const result = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    result.push(days[d.getDay()]);
+  }
+  return result;
+});
+
+const weeklyActivity = computed(() => {
+  // Aggregate runs from all runners for the last 7 days
+  const dailyData = [0, 0, 0, 0, 0, 0, 0];
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  
+  store.runners.forEach(runner => {
+    (runner.activities || []).forEach(run => {
+      const runDate = new Date(run.date);
+      const diffDays = Math.floor((today - runDate) / (1000 * 60 * 60 * 24));
+      if (diffDays >= 0 && diffDays < 7) {
+        dailyData[6 - diffDays] += (run.distance || 0);
+      }
+    });
+  });
+  return dailyData;
+});
+
+const weeklyTotal = computed(() => weeklyActivity.value.reduce((a, b) => a + b, 0));
+
+const chartPoints = computed(() => {
+  const data = weeklyActivity.value;
+  const max = Math.max(...data, 5); // at least 5km for scale
+  return data.map((val, i) => ({
+    x: i * 115, // 700 / 6 gaps
+    y: 200 - (val / (max || 1) * 160) - 20 // scale to height with padding
+  }));
+});
+
+const chartPathLine = computed(() => {
+  if (chartPoints.value.length === 0) return '';
+  return `M ${chartPoints.value.map(p => `${p.x},${p.y}`).join(' L ')}`;
+});
+
+const chartPathArea = computed(() => {
+  if (chartPoints.value.length === 0) return '';
+  const first = chartPoints.value[0];
+  const last = chartPoints.value[chartPoints.value.length - 1];
+  return `M ${first.x},200 L ${chartPoints.value.map(p => `${p.x},${p.y}`).join(' L ')} L ${last.x},200 Z`;
 });
 
 const totalRuns = computed(() => {
-  return store.runners.reduce((acc, r) => acc + r.runs, 0);
+  return store.runners.reduce((acc, r) => acc + (r.runs || 0), 0);
 });
 
 const runnersReachedGoal = computed(() => {

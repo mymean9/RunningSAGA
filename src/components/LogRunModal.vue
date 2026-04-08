@@ -1,19 +1,19 @@
 <template>
   <Transition name="modal">
-    <div v-if="isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-      <div class="bg-[#111111] border border-[#222222] w-full max-w-lg p-8 relative overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl modal-container">
+    <div v-if="isOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black md:bg-black/90 md:p-4 md:backdrop-blur-sm">
+      <div class="bg-[#000000] md:bg-[#111111] md:border md:border-[#222222] w-full h-full md:h-auto md:max-w-lg p-8 relative overflow-hidden overflow-y-auto custom-scrollbar shadow-2xl modal-container">
         <!-- Decor line -->
         <div class="absolute top-0 left-0 w-full h-1 bg-volt"></div>
         
-        <div class="flex justify-between items-start mb-8">
+        <div class="flex justify-between items-start mb-12 mt-6 md:mt-0">
           <div>
-            <h2 class="text-4xl font-black italic tracking-tighter text-white uppercase leading-none">
+            <h2 class="text-6xl md:text-4xl font-black italic tracking-tighter text-white uppercase leading-[0.8]">
               LOG NEW<br/><span class="text-volt">ACTIVITY</span>
             </h2>
-            <p class="text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase mt-2">Enter your run details</p>
+            <p class="text-[11px] font-bold tracking-[0.4em] text-white/40 uppercase mt-4">Enter your run details</p>
           </div>
-          <button @click="$emit('close')" class="text-white/40 hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <button @click="$emit('close')" class="text-white/40 hover:text-white transition-colors p-2 -mr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
 

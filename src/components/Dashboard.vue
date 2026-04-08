@@ -1,35 +1,30 @@
 <template>
   <div class="min-h-screen bg-[#000000]">
-    <div class="max-w-7xl mx-auto px-6 py-12">
-      <!-- HEADER -->
-      <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 border-b-2 border-volt/20 pb-8 space-y-8 md:space-y-0">
-        <div>
-          <h1 class="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-none text-white">
-            RUNNING<br />
-            <span class="text-volt">SAGA</span>
+    <div class="max-w-7xl mx-auto px-6 py-10">
+      <!-- MOBILE-FIRST PREMIUM HEADER -->
+      <div class="flex flex-col space-y-8 mb-12">
+        <div class="flex items-end justify-between border-b border-volt/20 pb-6">
+          <h1 class="text-4xl md:text-8xl font-black italic tracking-tighter uppercase leading-none text-white">
+            RUNNING<span class="text-volt">.SAGA</span>
           </h1>
-          <p class="max-w-md mt-4 text-white/50 text-sm font-bold uppercase tracking-widest leading-relaxed">
-            THE ULTIMATE LEADERBOARD FOR THE SAGA RUNNERS. TRACK YOUR PROGRESS AND RACE TO THE FINISH LINE.
-          </p>
+          <button 
+            @click="isModalOpen = true"
+            :disabled="!currentUser"
+            class="w-12 h-12 bg-volt text-black flex items-center justify-center rounded-sm transform active:scale-95 transition-all shadow-[0_0_15px_rgba(206,255,0,0.3)] disabled:opacity-30"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
         </div>
-        <div class="flex flex-col items-start md:items-end space-y-6">
-           <button 
-             @click="isModalOpen = true"
-             :disabled="!currentUser"
-             class="group relative inline-flex items-center px-8 py-4 bg-volt text-black overflow-hidden font-black italic text-xl uppercase tracking-tighter hover:bg-white transition-all transform hover:scale-[1.05] disabled:opacity-30 disabled:hover:scale-100 disabled:cursor-not-allowed"
-           >
-              <span class="relative z-10 flex items-center">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                 LOG RUN
-              </span>
-           </button>
-           <p v-if="!currentUser" class="text-[9px] font-bold tracking-[0.2em] text-white/40 uppercase italic">PLEASE LOGIN TO LOG RUNS (DEMO MODE)</p>
 
-           <div class="text-right">
-              <div class="text-4xl font-black italic text-white tracking-tighter leading-none">
-                 TOTAL <span class="text-volt">{{ totalDistance.toFixed(1) }}</span> KM
-              </div>
-              <p class="text-[10px] font-bold tracking-[0.3em] uppercase text-white/40 mt-1">COLLECTIVE DISTANCE THIS MONTH</p>
+        <!-- STAT CARDS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+           <div class="bg-[#111] border border-white/5 p-4 rounded-sm group hover:border-volt/30 transition-all">
+              <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">YOUR DISTANCE</p>
+              <p class="text-2xl font-black italic text-white leading-none">{{ (currentUser?.distance || 0).toFixed(1) }} <span class="text-[10px] text-volt">KM</span></p>
+           </div>
+           <div class="bg-[#111] border border-white/5 p-4 rounded-sm group hover:border-volt/30 transition-all">
+              <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">TRIBE TOTAL</p>
+              <p class="text-2xl font-black italic text-white leading-none">{{ totalDistance.toFixed(1) }} <span class="text-[10px] text-volt">KM</span></p>
            </div>
         </div>
       </div>
