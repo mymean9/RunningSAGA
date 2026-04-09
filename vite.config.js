@@ -8,5 +8,12 @@ export default defineConfig({
     port: 5174,
     strictPort: true,
     host: true
+  },
+  build: {
+    rollupOptions: {
+      external: [
+        '@capacitor-community/background-geolocation'
+      ]
+    }
   }
 })
