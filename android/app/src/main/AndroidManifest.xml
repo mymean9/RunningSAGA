@@ -34,7 +34,13 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
 
-        <!-- Service for Community Background Geolocation (Mandatory for API 34+) -->
+        <service
+            android:name=".TrackingService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
+        <!-- Service for Community Background Geolocation -->
         <service
             android:name="com.mendhak.geolocation.BackgroundGeolocationService"
             android:enabled="true"
