@@ -164,8 +164,7 @@ import html2canvas from 'html2canvas';
 // Capacitor Native Plugins
 import { Geolocation } from '@capacitor/geolocation';
 import { Motion } from '@capacitor/motion';
-import { registerPlugin } from '@capacitor/core';
-const BackgroundGeolocation = registerPlugin('BackgroundGeolocation');
+import BackgroundGeolocation from "@transistorsoft/capacitor-background-geolocation";
 
 const props = defineProps({
   currentUser: Object
@@ -382,81 +381,91 @@ const startTracking = async () => {
 
   await nextTick();
   
-  // Capacitor Native Geolocation Tracking (Now using Background-capable watcher)
-  if (!watchId) {
-    watchId = await BackgroundGeolocation.addWatcher(
-      { 
-        backgroundTitle: "SAGA RUNNING TRACKER",
-        backgroundMessage: "RUNNING SAGA IS RECORDING YOUR RUN...",
-        requestPermissions: true,
-        stale: false,
-        distanceFilter: 5 // Record Every 5 meters change
-      },
-      (pos, err) => {
-        if (err) {
-          console.error("Background GPS Error:", err);
-          return;
-        }
-        if (!pos) return;
+  // Capacitor Transistorsoft Background Geolocation Tracking
+  if (!isTracking.value) {
+    const onLocation = (location) => {
+      console.log('[location] - ', location);
+      const { latitude, longitude, accuracy } = location.coords;
+      
+      // Accuracy filter
+      if (accuracy > 30) return;
 
-        const { latitude, longitude, accuracy } = pos;
-        
-        // [오차 필터링] 오차가 25m 이상인 부정확한 데이터 무시
-        if (accuracy > 25) {
-          console.warn(`GPS 튐 무시됨: 오차 반경 ${accuracy.toFixed(1)}m`);
-          return;
-        }
+      const newPoint = [latitude, longitude];
+      routeCoordinates.value.push(newPoint);
 
-        const newPoint = [latitude, longitude];
-        
-        routeCoordinates.value.push(newPoint);
+      // Map dynamic update
+      if (!map && mapContainer.value) {
+        map = L.map(mapContainer.value, { zoomControl: false }).setView(newPoint, 17);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap',
+          crossOrigin: true
+        }).addTo(map);
 
-        if (!map && mapContainer.value) {
-          map = L.map(mapContainer.value, { zoomControl: false }).setView(newPoint, 17);
-          
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
-            crossOrigin: true
-          }).addTo(map);
-
-          polyline = L.polyline(routeCoordinates.value, { color: '#0066FF', weight: 6 }).addTo(map);
-          
-          marker = L.circleMarker(newPoint, {
-            radius: 7,
-            fillColor: "#0066FF",
-            color: "#FFFFFF",
-            weight: 3,
-            opacity: 1,
-            fillOpacity: 1
-          }).addTo(map);
-          
-          setTimeout(() => { if(map) map.invalidateSize(); }, 200);
-        } else if (map) {
-          polyline.setLatLngs(routeCoordinates.value);
-          marker.setLatLng(newPoint);
-          map.setView(newPoint, map.getZoom(), { animate: false });
-        }
+        polyline = L.polyline(routeCoordinates.value, { color: '#0066FF', weight: 6 }).addTo(map);
+        marker = L.circleMarker(newPoint, {
+          radius: 7,
+          fillColor: "#0066FF",
+          color: "#FFFFFF",
+          weight: 3,
+          opacity: 1,
+          fillOpacity: 1
+        }).addTo(map);
+        setTimeout(() => { if(map) map.invalidateSize(); }, 200);
+      } else if (map) {
+        polyline.setLatLngs(routeCoordinates.value);
+        marker.setLatLng(newPoint);
+        map.setView(newPoint, map.getZoom(), { animate: false });
       }
-    );
+    };
+
+    // Configure and Start the engine
+    try {
+      await BackgroundGeolocation.ready({
+        desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
+        distanceFilter: 10,
+        stopOnTerminate: false,
+        startOnBoot: true,
+        debug: false,
+        logLevel: BackgroundGeolocation.LOG_LEVEL_OFF,
+        notification: {
+          title: "SAGA RUNNING TRACKER",
+          text: "RECORDING YOUR RUN IN BACKGROUND..."
+        }
+      });
+
+      BackgroundGeolocation.onLocation(onLocation, (error) => {
+        console.error('[location] ERROR - ', error);
+      });
+
+      await BackgroundGeolocation.start();
+      isTracking.value = true;
+    } catch (error) {
+      console.error('Failed to start BackgroundGeolocation:', error);
+      alert('FAILED TO START TRACKING ENGINE: ' + error);
+    }
   }
 };
 
-const stopTracking = () => {
+const stopTracking = async () => {
   isTracking.value = false;
   if (steps.value > 0) {
     speak("러닝을 일시 정지합니다.");
   }
   releaseWakeLock();
   
-  // Clean Capacitor listeners
+  // Clean Capacitor Motion listener
   if (motionListenerId) {
     Motion.removeAllListeners();
     motionListenerId = null;
   }
   
-  if (watchId) {
-    BackgroundGeolocation.removeWatcher({ id: watchId });
-    watchId = null;
+  // Stop Transistorsoft engine
+  try {
+    await BackgroundGeolocation.stop();
+    // removeListeners() is good practice
+    // BackgroundGeolocation.removeListeners(); 
+  } catch (error) {
+    console.error('Failed to stop BackgroundGeolocation:', error);
   }
 };
 
