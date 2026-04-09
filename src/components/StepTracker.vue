@@ -164,8 +164,7 @@ import html2canvas from 'html2canvas';
 // Capacitor Native Plugins
 import { Geolocation } from '@capacitor/geolocation';
 import { Motion } from '@capacitor/motion';
-import { registerPlugin } from '@capacitor/core';
-const BackgroundGeolocation = registerPlugin('BackgroundGeolocation');
+import { BackgroundGeolocation } from '@capacitor-community/background-geolocation';
 
 const props = defineProps({
   currentUser: Object
@@ -265,7 +264,7 @@ const handleMotion = (event) => {
 
 const requestPermission = async () => {
   try {
-    // 1. Geolocation Permission
+    // 1. Geolocation Permission Check
     const geoStatus = await Geolocation.checkPermissions();
     console.log('Current Geo Status:', geoStatus);
 
@@ -276,17 +275,16 @@ const requestPermission = async () => {
        }
     }
     
-    // 2. Notification Permission (Required for Android 13+ to show Background Notification)
-    // We can use a try-catch for platforms that don't support it
+    // 2. Notification Permission (Required for Android 13+)
     try {
       if ('Notification' in window && Notification.permission !== 'granted') {
         await Notification.requestPermission();
       }
     } catch (e) {
-      console.warn("Notification permission request not supported in this environment");
+      console.warn("Notification permission request not supported");
     }
 
-    // 3. Motion / Sensor Permission (Mainly for iOS, but good for Android webview)
+    // 3. Motion / Sensor Permission
     if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
       const motionRes = await DeviceMotionEvent.requestPermission();
       if (motionRes !== 'granted') {
@@ -294,16 +292,19 @@ const requestPermission = async () => {
       }
     }
 
+    // Start tracking - Background tracking will handle its own permission check if needed
     startTracking();
   } catch (error) {
     console.error('Error requesting permission:', error);
     let msg = 'SENSOR/GPS ACCESS DENIED.';
     if (error.message === 'LOCATION_PERMISSION_DENIED') {
-      msg = 'GPS/LOCATION ACCESS IS REQUIRED TO TRACK YOUR RUN. PLEASE ENABLE IN SETTINGS.';
-    } else if (error.message === 'MOTION_PERMISSION_DENIED') {
-      msg = 'MOTION SENSOR ACCESS IS REQUIRED FOR THE STEP COUNTER. PLEASE ENABLE IN SETTINGS.';
+      msg = 'GPS/LOCATION ACCESS IS REQUIRED. PLEASE SET LOCATION PERMISSION TO "ALLOW ALL THE TIME" IN SETTINGS FOR BACKGROUND TRACKING.';
+      if (confirm(msg + '\n\nWOULD YOU LIKE TO OPEN SETTINGS NOW?')) {
+        await BackgroundGeolocation.openSettings();
+      }
+    } else {
+      alert(error.message || msg);
     }
-    alert(msg);
   }
 };
 
