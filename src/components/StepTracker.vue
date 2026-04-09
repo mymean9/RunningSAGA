@@ -164,7 +164,8 @@ import html2canvas from 'html2canvas';
 // Capacitor Native Plugins
 import { Geolocation } from '@capacitor/geolocation';
 import { Motion } from '@capacitor/motion';
-import BackgroundGeolocation from "@transistorsoft/capacitor-background-geolocation";
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { BackgroundGeolocation } from '@capacitor-community/background-geolocation';
 
 const props = defineProps({
   currentUser: Object
@@ -173,8 +174,8 @@ const props = defineProps({
 const steps = ref(0);
 const isTracking = ref(false);
 const lastStepTime = ref(0);
-const threshold = ref(4.5); // Optimized for both walking and running
-const cooldown = 330; // 180ppm cadence support
+const threshold = ref(4.5);
+const cooldown = 330;
 
 // Pocket Mode / Lock variables
 const isScreenLocked = ref(false);
@@ -193,11 +194,11 @@ let watchId = null;
 let motionListenerId = null;
 
 // Low-pass filter variables
-const alpha = 0.8; // Smoothing factor
+const alpha = 0.8;
 const lastAcc = { x: 0, y: 0, z: 0 };
 const isPeak = ref(false);
 
-const targetDistance = ref(5.0); // Goal in KM
+const targetDistance = ref(5.0);
 
 const distance = computed(() => (steps.value * 0.00075)); 
 const calories = computed(() => Math.floor(steps.value * 0.04));
@@ -211,7 +212,6 @@ const speak = (text) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'ko-KR';
     utterance.rate = 1.0;
-    // Android/iOS Chrome require speech synthesis to be triggered by a user interaction initially
     window.speechSynthesis.speak(utterance);
   }
 };
@@ -236,38 +236,27 @@ watch(distance, (newDist) => {
 
 const handleMotion = (event) => {
   if (!isTracking.value) return;
-
   const acc = event.acceleration || event.accelerationIncludingGravity;
   if (!acc || acc.x === null) return;
 
-  // 1. Low-Pass Filter: Smooth high-frequency noise (jitter/shaking)
   lastAcc.x = alpha * lastAcc.x + (1 - alpha) * acc.x;
   lastAcc.y = alpha * lastAcc.y + (1 - alpha) * acc.y;
   lastAcc.z = alpha * lastAcc.z + (1 - alpha) * acc.z;
 
-  // 2. Magnitude of smoothed acceleration
   const magnitude = Math.sqrt(lastAcc.x ** 2 + lastAcc.y ** 2 + lastAcc.z ** 2);
-  
-  // 3. Peak Detection with Hysteresis
-  // We look for the moment acceleration goes UP over threshold
   const now = Date.now();
   if (magnitude > threshold.value && !isPeak.value && (now - lastStepTime.value) > cooldown) {
     isPeak.value = true;
     steps.value++;
     lastStepTime.value = now;
-
   } else if (magnitude < threshold.value * 0.7) {
-    // Reset peak flag when acceleration falls back down
     isPeak.value = false;
   }
 };
 
 const requestPermission = async () => {
   try {
-    // 1. Geolocation Permission Check
     const geoStatus = await Geolocation.checkPermissions();
-    console.log('Current Geo Status:', geoStatus);
-
     if (geoStatus.location !== 'granted') {
        const requestRes = await Geolocation.requestPermissions();
        if (requestRes.location !== 'granted') {
@@ -275,16 +264,15 @@ const requestPermission = async () => {
        }
     }
     
-    // 2. Notification Permission (Required for Android 13+)
     try {
-      if ('Notification' in window && Notification.permission !== 'granted') {
-        await Notification.requestPermission();
+      const notifyPerm = await LocalNotifications.requestPermissions();
+      if (notifyPerm.display !== 'granted') {
+        console.warn("Notification permission denied by user");
       }
     } catch (e) {
-      console.warn("Notification permission request not supported");
+      console.warn("LocalNotifications not supported");
     }
 
-    // 3. Motion / Sensor Permission
     if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
       const motionRes = await DeviceMotionEvent.requestPermission();
       if (motionRes !== 'granted') {
@@ -292,18 +280,15 @@ const requestPermission = async () => {
       }
     }
 
-    // Start tracking - Background tracking will handle its own permission check if needed
     startTracking();
   } catch (error) {
-    console.error('Error requesting permission:', error);
-    let msg = 'SENSOR/GPS ACCESS DENIED.';
+    console.error('Permission error:', error);
     if (error.message === 'LOCATION_PERMISSION_DENIED') {
-      msg = 'GPS/LOCATION ACCESS IS REQUIRED. PLEASE SET LOCATION PERMISSION TO "ALLOW ALL THE TIME" IN SETTINGS FOR BACKGROUND TRACKING.';
-      if (confirm(msg + '\n\nWOULD YOU LIKE TO OPEN SETTINGS NOW?')) {
+      if (confirm('GPS ACCESS IS REQUIRED FOR BACKGROUND TRACKING.\n\nOPEN SETTINGS NOW?')) {
         await BackgroundGeolocation.openSettings();
       }
     } else {
-      alert(error.message || msg);
+      alert(error.message || 'SENSOR ACCESS DENIED.');
     }
   }
 };
@@ -343,13 +328,9 @@ const handleUnlockStart = (e) => {
   unlockProgress.value = 0;
   clearInterval(unlockInterval);
   clearTimeout(unlockTimer);
-  
   unlockInterval = setInterval(() => {
-    if (unlockProgress.value < 100) {
-      unlockProgress.value += 5;
-    }
+    if (unlockProgress.value < 100) unlockProgress.value += 5;
   }, 50);
-
   unlockTimer = setTimeout(() => {
     isScreenLocked.value = false;
     unlockProgress.value = 0;
@@ -360,11 +341,7 @@ const handleUnlockStart = (e) => {
 const handleUnlockEnd = () => {
   clearInterval(unlockInterval);
   clearTimeout(unlockTimer);
-  setTimeout(() => {
-    if (isScreenLocked.value) {
-      unlockProgress.value = 0;
-    }
-  }, 50);
+  setTimeout(() => { if (isScreenLocked.value) unlockProgress.value = 0; }, 50);
 };
 
 const startTracking = async () => {
@@ -373,104 +350,65 @@ const startTracking = async () => {
   } else {
     speak("러닝을 재개합니다.");
   }
+  
   isTracking.value = true;
   requestWakeLock();
   
-  // Capacitor Native Motion Tracking (Accelerometer)
-  motionListenerId = await Motion.addListener('accel', handleMotion);
+  // Independent Motion Listener for Steps
+  if (!motionListenerId) {
+    motionListenerId = await Motion.addListener('accel', handleMotion);
+  }
 
   await nextTick();
   
-  // Capacitor Transistorsoft Background Geolocation Tracking
-  if (!isTracking.value) {
-    const onLocation = (location) => {
-      console.log('[location] - ', location);
-      const { latitude, longitude, accuracy } = location.coords;
-      
-      // Accuracy filter
-      if (accuracy > 30) return;
+  // Free Community Background Geolocation Watcher
+  try {
+    watchId = await BackgroundGeolocation.addWatcher(
+      { 
+        backgroundTitle: "🏃‍♂️ SAGA RUNNING TRACKER",
+        backgroundMessage: "SCREEN OFF TRACKING ACTIVE - RECORDING YOUR RUN",
+        requestPermissions: true,
+        stale: false,
+        distanceFilter: 10
+      },
+      (pos, err) => {
+        if (err || !pos) return;
+        const { latitude, longitude, accuracy } = pos;
+        if (accuracy > 30) return;
 
-      const newPoint = [latitude, longitude];
-      routeCoordinates.value.push(newPoint);
+        const newPoint = [latitude, longitude];
+        routeCoordinates.value.push(newPoint);
 
-      // Map dynamic update
-      if (!map && mapContainer.value) {
-        map = L.map(mapContainer.value, { zoomControl: false }).setView(newPoint, 17);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap',
-          crossOrigin: true
-        }).addTo(map);
-
-        polyline = L.polyline(routeCoordinates.value, { color: '#0066FF', weight: 6 }).addTo(map);
-        marker = L.circleMarker(newPoint, {
-          radius: 7,
-          fillColor: "#0066FF",
-          color: "#FFFFFF",
-          weight: 3,
-          opacity: 1,
-          fillOpacity: 1
-        }).addTo(map);
-        setTimeout(() => { if(map) map.invalidateSize(); }, 200);
-      } else if (map) {
-        polyline.setLatLngs(routeCoordinates.value);
-        marker.setLatLng(newPoint);
-        map.setView(newPoint, map.getZoom(), { animate: false });
-      }
-    };
-
-    // Configure and Start the engine
-    try {
-      // PROACTIVE PERMISSION REQUEST (Very Important for Android 16)
-      await BackgroundGeolocation.requestPermission();
-
-      await BackgroundGeolocation.ready({
-        desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-        distanceFilter: 10,
-        stopOnTerminate: false,
-        startOnBoot: true,
-        debug: true, // Keep debug beep/vib for verification
-        logLevel: BackgroundGeolocation.LOG_LEVEL_VERBOSE,
-        // Android Specific Notification Config
-        notification: {
-          title: "🏃‍♂️ SAGA RUNNING TRACKER",
-          text: "ACTIVE RUNNING LOG - SCREEN OFF TRACKING ENABLED",
-          color: "#0066FF",
-          priority: BackgroundGeolocation.NOTIFICATION_PRIORITY_MAX,
-          channelName: "Running Tracker"
+        if (!map && mapContainer.value) {
+          map = L.map(mapContainer.value, { zoomControl: false }).setView(newPoint, 17);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', crossOrigin: true }).addTo(map);
+          polyline = L.polyline(routeCoordinates.value, { color: '#0066FF', weight: 6 }).addTo(map);
+          marker = L.circleMarker(newPoint, { radius: 7, fillColor: "#0066FF", color: "#FFFFFF", weight: 3, opacity: 1, fillOpacity: 1 }).addTo(map);
+          setTimeout(() => { if(map) map.invalidateSize(); }, 200);
+        } else if (map) {
+          polyline.setLatLngs(routeCoordinates.value);
+          marker.setLatLng(newPoint);
+          map.setView(newPoint, map.getZoom(), { animate: false });
         }
-      });
-
-      BackgroundGeolocation.onLocation(onLocation, (error) => {
-        console.error('[location] ERROR - ', error);
-      });
-
-      await BackgroundGeolocation.start();
-      isTracking.value = true;
-    } catch (error) {
-      console.error('Failed to start BackgroundGeolocation:', error);
-      alert('PERMISSION OR ENGINE ERROR: ' + error + '\n\nPLEASE ENSURE LOCATION IS SET TO "ALLOW ALL THE TIME" AND NOTIFICATIONS ARE ALLOWED.');
-    }
+      }
+    );
+  } catch (error) {
+    console.error('Background Geolocation failed:', error);
   }
 };
 
 const stopTracking = async () => {
   isTracking.value = false;
-  if (steps.value > 0) {
-    speak("러닝을 일시 정지합니다.");
-  }
   releaseWakeLock();
-  
-  // Clean Capacitor Motion listener
   if (motionListenerId) {
     Motion.removeAllListeners();
     motionListenerId = null;
   }
-  
-  // Stop Transistorsoft engine
-  try {
-    await BackgroundGeolocation.stop();
-  } catch (error) {
-    console.error('Failed to stop BackgroundGeolocation:', error);
+  if (watchId) {
+    try {
+      await BackgroundGeolocation.removeWatcher({ id: watchId });
+      watchId = null;
+    } catch (e) { console.error(e); }
   }
 };
 
@@ -483,56 +421,27 @@ const finishSession = async () => {
         const canvas = await html2canvas(captureEl, { useCORS: true, backgroundColor: "#000000" });
         const imgData = canvas.toDataURL("image/png");
         const a = document.createElement("a");
-        a.href = imgData;
-        a.download = `SAGA_Run_${new Date().getTime()}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } catch (err) {
-        console.error("Screenshot failed:", err);
-      }
+        a.href = imgData; a.download = `SAGA_Run_${new Date().getTime()}.png`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      } catch (err) { console.error(err); }
     }
 
-    // 실제 페이스 계산 (분:초 / km)
     const distKm = parseFloat(distance.value.toFixed(2));
-    const elapsedMs = lastStepTime.value > 0 ? (Date.now() - (lastStepTime.value - steps.value * cooldown)) : 0;
-    let paceStr = "AUTO";
-    if (distKm > 0 && elapsedMs > 0) {
-      const totalSec = elapsedMs / 1000;
-      const secPerKm = totalSec / distKm;
-      const min = Math.floor(secPerKm / 60);
-      const sec = Math.round(secPerKm % 60).toString().padStart(2, '0');
-      paceStr = `${min}'${sec}"`;
-    }
-
     store.addRun({
       name: props.currentUser.name,
       distance: distKm,
-      pace: paceStr,
+      pace: "AUTO",
       date: new Date().toISOString(),
-      image: null,   // 이미지는 기기에만 다운로드 저장, Firestore에는 저장 안 함
       route: [...routeCoordinates.value]
     });
-    alert(`GREAT JOB! ${steps.value} STEPS LOGGED & SNAPSHOT SAVED.`);
+    alert(`GREAT JOB! ${steps.value} STEPS LOGGED.`);
   }
-  steps.value = 0;
-  lastAnnouncedKm = 0;
-  goalReachedAnnounced = false;
-  routeCoordinates.value = [];
-  if (map) {
-    map.remove();
-    map = null;
-  }
+  steps.value = 0; routeCoordinates.value = [];
+  if (map) { map.remove(); map = null; }
   stopTracking();
 };
 
-onUnmounted(() => {
-  stopTracking();
-  if (map) {
-    map.remove();
-    map = null;
-  }
-});
+onUnmounted(() => { stopTracking(); if (map) { map.remove(); map = null; } });
 </script>
 
 <style scoped>
