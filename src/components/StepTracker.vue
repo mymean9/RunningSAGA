@@ -164,7 +164,8 @@ import html2canvas from 'html2canvas';
 // Capacitor Native Plugins
 import { Geolocation } from '@capacitor/geolocation';
 import { Motion } from '@capacitor/motion';
-import { BackgroundGeolocation } from '@capacitor-community/background-geolocation';
+import { registerPlugin } from '@capacitor/core';
+const BackgroundGeolocation = registerPlugin('BackgroundGeolocation');
 
 const props = defineProps({
   currentUser: Object
