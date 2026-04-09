@@ -420,16 +420,23 @@ const startTracking = async () => {
 
     // Configure and Start the engine
     try {
+      // PROACTIVE PERMISSION REQUEST (Very Important for Android 16)
+      await BackgroundGeolocation.requestPermission();
+
       await BackgroundGeolocation.ready({
         desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
         distanceFilter: 10,
         stopOnTerminate: false,
         startOnBoot: true,
-        debug: false,
-        logLevel: BackgroundGeolocation.LOG_LEVEL_OFF,
+        debug: true, // Keep debug beep/vib for verification
+        logLevel: BackgroundGeolocation.LOG_LEVEL_VERBOSE,
+        // Android Specific Notification Config
         notification: {
-          title: "SAGA RUNNING TRACKER",
-          text: "RECORDING YOUR RUN IN BACKGROUND..."
+          title: "🏃‍♂️ SAGA RUNNING TRACKER",
+          text: "ACTIVE RUNNING LOG - SCREEN OFF TRACKING ENABLED",
+          color: "#0066FF",
+          priority: BackgroundGeolocation.NOTIFICATION_PRIORITY_MAX,
+          channelName: "Running Tracker"
         }
       });
 
@@ -441,7 +448,7 @@ const startTracking = async () => {
       isTracking.value = true;
     } catch (error) {
       console.error('Failed to start BackgroundGeolocation:', error);
-      alert('FAILED TO START TRACKING ENGINE: ' + error);
+      alert('PERMISSION OR ENGINE ERROR: ' + error + '\n\nPLEASE ENSURE LOCATION IS SET TO "ALLOW ALL THE TIME" AND NOTIFICATIONS ARE ALLOWED.');
     }
   }
 };
@@ -462,8 +469,6 @@ const stopTracking = async () => {
   // Stop Transistorsoft engine
   try {
     await BackgroundGeolocation.stop();
-    // removeListeners() is good practice
-    // BackgroundGeolocation.removeListeners(); 
   } catch (error) {
     console.error('Failed to stop BackgroundGeolocation:', error);
   }

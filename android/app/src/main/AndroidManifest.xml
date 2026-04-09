@@ -34,6 +34,10 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
 
+        <!-- Notification settings for Background Geolocation -->
+        <meta-data android:name="com.transistorsoft.locationmanager.notification_channel_name" android:value="Running Tracker" />
+        <meta-data android:name="com.transistorsoft.locationmanager.notification_priority" android:value="MAX" />
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
