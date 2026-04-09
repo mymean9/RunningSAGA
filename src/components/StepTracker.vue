@@ -377,7 +377,7 @@ const startTracking = async () => {
         stale: false,
         distanceFilter: 10
       },
-      (pos, err) => {
+      async (pos, err) => {
         if (err || !pos) return;
         const { latitude, longitude, accuracy } = pos;
         if (accuracy > 30) return;
@@ -385,12 +385,26 @@ const startTracking = async () => {
         const newPoint = [latitude, longitude];
         routeCoordinates.value.push(newPoint);
 
+        // Map dynamic update
         if (!map && mapContainer.value) {
-          map = L.map(mapContainer.value, { zoomControl: false }).setView(newPoint, 17);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', crossOrigin: true }).addTo(map);
+          // ENSURE CONTAINER IS READY
+          await nextTick();
+          map = L.map(mapContainer.value, { 
+            zoomControl: false,
+            fadeAnimation: false,
+            markerZoomAnimation: false
+          }).setView(newPoint, 17);
+          
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+            attribution: '© OpenStreetMap', 
+            crossOrigin: true 
+          }).addTo(map);
+          
           polyline = L.polyline(routeCoordinates.value, { color: '#0066FF', weight: 6 }).addTo(map);
           marker = L.circleMarker(newPoint, { radius: 7, fillColor: "#0066FF", color: "#FFFFFF", weight: 3, opacity: 1, fillOpacity: 1 }).addTo(map);
-          setTimeout(() => { if(map) map.invalidateSize(); }, 200);
+          
+          // CRITICAL: Force map to recognize its container size
+          setTimeout(() => { if(map) map.invalidateSize(); }, 300);
         } else if (map) {
           polyline.setLatLngs(routeCoordinates.value);
           marker.setLatLng(newPoint);
@@ -454,6 +468,17 @@ onUnmounted(() => { stopTracking(); if (map) { map.remove(); map = null; } });
 <style scoped>
 .animate-pulse-light {
   animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* CRITICAL: Ensure Map is visible and has height */
+#capture-area :deep(.leaflet-container),
+div[ref="mapContainer"],
+.w-full.h-56 {
+  min-height: 250px !important;
+  height: 250px !important;
+  background: #111 !important;
+  position: relative;
+  z-index: 5;
 }
 
 @keyframes pulse-light {
