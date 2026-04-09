@@ -165,7 +165,11 @@ import html2canvas from 'html2canvas';
 import { Geolocation } from '@capacitor/geolocation';
 import { Motion } from '@capacitor/motion';
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { BackgroundGeolocation } from '@capacitor-community/background-geolocation';
+
+// Dynamic import for background geolocation to avoid vite build errors
+const getBackgroundGeolocation = async () => {
+  return (await import('@capacitor-community/background-geolocation')).BackgroundGeolocation;
+};
 
 const props = defineProps({
   currentUser: Object
@@ -285,7 +289,8 @@ const requestPermission = async () => {
     console.error('Permission error:', error);
     if (error.message === 'LOCATION_PERMISSION_DENIED') {
       if (confirm('GPS ACCESS IS REQUIRED FOR BACKGROUND TRACKING.\n\nOPEN SETTINGS NOW?')) {
-        await BackgroundGeolocation.openSettings();
+        const BG = await getBackgroundGeolocation();
+        await BG.openSettings();
       }
     } else {
       alert(error.message || 'SENSOR ACCESS DENIED.');
@@ -363,7 +368,8 @@ const startTracking = async () => {
   
   // Free Community Background Geolocation Watcher
   try {
-    watchId = await BackgroundGeolocation.addWatcher(
+    const BG = await getBackgroundGeolocation();
+    watchId = await BG.addWatcher(
       { 
         backgroundTitle: "🏃‍♂️ SAGA RUNNING TRACKER",
         backgroundMessage: "SCREEN OFF TRACKING ACTIVE - RECORDING YOUR RUN",
@@ -406,7 +412,8 @@ const stopTracking = async () => {
   }
   if (watchId) {
     try {
-      await BackgroundGeolocation.removeWatcher({ id: watchId });
+      const BG = await getBackgroundGeolocation();
+      await BG.removeWatcher({ id: watchId });
       watchId = null;
     } catch (e) { console.error(e); }
   }
