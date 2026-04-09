@@ -34,13 +34,6 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
 
-        <!-- Background Geolocation Service -->
-        <service
-            android:name="com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="location" />
-
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
