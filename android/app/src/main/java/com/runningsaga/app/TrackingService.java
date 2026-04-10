@@ -25,8 +25,17 @@ public class TrackingService extends Service implements SensorEventListener {
 
     private SensorManager sensorManager;
     private Sensor stepSensor;
+    private Sensor accelSensor;
+    
     private boolean isInitialStepSet = false;
     private float initialStepCount = 0;
+    
+    // Software Fallback Variables
+    private boolean isAccelPeak = false;
+    private long lastAccelTime = 0;
+    private int manualStepCount = 0;
+    private float[] lastAccel = {0f, 0f, 0f};
+    private float alpha = 0.8f;
 
     @Override
     public void onCreate() {
@@ -58,17 +67,23 @@ public class TrackingService extends Service implements SensorEventListener {
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "RunningSAGA:TrackerLock");
         wakeLock.acquire();
 
-        // Register Hardware Step Counter
+        // Register Hardware Step Counter & Accelerometer Fallback
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {
             stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+            accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            
             if (stepSensor != null) {
                 sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_UI);
+            }
+            if (accelSensor != null) {
+                sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_UI);
             }
         }
 
         // Reset step count for new session
         isInitialStepSet = false;
+        manualStepCount = 0;
         SharedPreferences prefs = getSharedPreferences("SagaPrefs", Context.MODE_PRIVATE);
         prefs.edit().putInt("native_steps", 0).apply();
 
@@ -98,6 +113,32 @@ public class TrackingService extends Service implements SensorEventListener {
             
             SharedPreferences prefs = getSharedPreferences("SagaPrefs", Context.MODE_PRIVATE);
             prefs.edit().putInt("native_steps", currentSessionSteps).apply();
+            
+        } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+            
+            lastAccel[0] = alpha * lastAccel[0] + (1 - alpha) * x;
+            lastAccel[1] = alpha * lastAccel[1] + (1 - alpha) * y;
+            lastAccel[2] = alpha * lastAccel[2] + (1 - alpha) * z;
+            
+            double magnitude = Math.sqrt(lastAccel[0]*lastAccel[0] + lastAccel[1]*lastAccel[1] + lastAccel[2]*lastAccel[2]);
+            long now = System.currentTimeMillis();
+            
+            if (magnitude > 12.0 && !isAccelPeak && (now - lastAccelTime) > 330) {
+                isAccelPeak = true;
+                lastAccelTime = now;
+                manualStepCount++;
+                
+                // If the hardware step counter hasn't fired yet (e.g. permission denied or missing), use this software counter!
+                if (!isInitialStepSet) {
+                    SharedPreferences prefs = getSharedPreferences("SagaPrefs", Context.MODE_PRIVATE);
+                    prefs.edit().putInt("native_steps", manualStepCount).apply();
+                }
+            } else if (magnitude < 10.5) {
+                isAccelPeak = false;
+            }
         }
     }
 
