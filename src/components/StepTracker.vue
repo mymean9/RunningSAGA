@@ -279,8 +279,14 @@ const requestPermission = async () => {
 };
 
 const openAppSettings = async () => {
-  const BG = await getBackgroundGeolocation();
-  await BG.openSettings();
+  try {
+    await TrackingBridge.openAppSettings();
+  } catch (e) {
+    console.error("Native settings open failed", e);
+    // Fallback to plugin if native fails
+    const BG = await getBackgroundGeolocation();
+    await BG.openSettings();
+  }
 };
 
 const toggleMapFullscreen = async () => {
@@ -303,19 +309,39 @@ const startTracking = async () => {
   
   isTracking.value = true;
   
-  // A. Start Native Survival Service
+  // 1. Kickstart Native Survival Service
   try {
     await TrackingBridge.startService();
   } catch (e) { console.error("Native Bridge Start Failed:", e); }
 
-  // B. Start Steps (Motion)
+  // 2. Start Steps (Motion)
   if (!motionListenerId) {
     motionListenerId = await Motion.addListener('accel', handleMotion);
   }
 
   await nextTick();
   
-  // C. Start GPS (Open Source Watcher)
+  // 3. IMMEDIATE MAP INITIALIZATION (CRITICAL FIX)
+  // We initialize the map with a default view first so the user SEES the map container immediately.
+  if (!map && mapContainer.value) {
+    map = L.map(mapContainer.value, { 
+      zoomControl: false,
+      fadeAnimation: false,
+      markerZoomAnimation: false
+    }).setView([37.5665, 126.9780], 15); // Default Seoul view until GPS is locked
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+      attribution: '© OpenStreetMap', 
+      crossOrigin: true 
+    }).addTo(map);
+    
+    polyline = L.polyline(routeCoordinates.value, { color: '#0066FF', weight: 6, lineCap: 'round' }).addTo(map);
+    marker = L.circleMarker([37.5665, 126.9780], { radius: 7, fillColor: "#0066FF", color: "#FFFFFF", weight: 3, opacity: 0, fillOpacity: 0 }).addTo(map);
+    
+    setTimeout(() => { if(map) map.invalidateSize(); }, 500);
+  }
+
+  // 4. Start GPS (Open Source Watcher)
   try {
     const BG = await getBackgroundGeolocation();
     watchId = await BG.addWatcher(
@@ -329,31 +355,15 @@ const startTracking = async () => {
       async (pos, err) => {
         if (err || !pos) return;
         const { latitude, longitude, accuracy } = pos;
-        if (accuracy > 30) return;
+        if (accuracy > 35) return; // Ignore low accuracy points
 
         const newPoint = [latitude, longitude];
         routeCoordinates.value.push(newPoint);
 
-        if (!map && mapContainer.value) {
-          await nextTick();
-          map = L.map(mapContainer.value, { 
-            zoomControl: false,
-            fadeAnimation: false,
-            markerZoomAnimation: false
-          }).setView(newPoint, 17);
-          
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-            attribution: '© OpenStreetMap', 
-            crossOrigin: true 
-          }).addTo(map);
-          
-          polyline = L.polyline(routeCoordinates.value, { color: '#0066FF', weight: 6, lineCap: 'round' }).addTo(map);
-          marker = L.circleMarker(newPoint, { radius: 7, fillColor: "#0066FF", color: "#FFFFFF", weight: 3, opacity: 1, fillOpacity: 1 }).addTo(map);
-          
-          setTimeout(() => { if(map) map.invalidateSize(); }, 500);
-        } else if (map) {
+        if (map) {
           polyline.setLatLngs(routeCoordinates.value);
           marker.setLatLng(newPoint);
+          marker.setStyle({ opacity: 1, fillOpacity: 1 }); // Show marker once GPS is locked
           if (!isMapFullscreen.value) {
              map.setView(newPoint, map.getZoom(), { animate: false });
           }

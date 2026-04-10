@@ -4,6 +4,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.provider.Settings;
 import android.os.Build;
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
@@ -56,5 +58,17 @@ class TrackingBridge extends Plugin {
         context.stopService(intent);
         call.resolve();
     }
+
+    @PluginMethod
+    public void openAppSettings(PluginCall call) {
+        Context context = getContext();
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", context.getPackageName(), null);
+        intent.setData(uri);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+        call.resolve();
+    }
 }
+
 
