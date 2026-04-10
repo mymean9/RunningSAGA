@@ -152,7 +152,6 @@
 
 <script setup>
 import { ref, computed, onUnmounted, nextTick, watch } from 'vue';
-import { onBeforeRouteLeave } from 'vue-router';
 import { store } from '../dataStore';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -181,20 +180,6 @@ const isTracking = ref(false);
 const lastStepTime = ref(0);
 const threshold = ref(3.5);
 const cooldown = 330;
-
-onBeforeRouteLeave((to, from, next) => {
-  if (isTracking.value || steps.value > 0) {
-    const answer = window.confirm('현재 러닝 기록을 측정 중입니다. 기록을 취소하고 나가시겠습니까?');
-    if (answer) {
-      stopTracking();
-      next();
-    } else {
-      next(false);
-    }
-  } else {
-    next();
-  }
-});
 
 // Pocket Mode / Lock variables
 const isScreenLocked = ref(false);
@@ -342,6 +327,7 @@ const startTracking = async () => {
   if (steps.value === 0) speak("러닝 사가 측정을 시작합니다.");
   
   isTracking.value = true;
+  store.isTrackingActive = true;
   
   // 1. Kickstart Native Survival Service
   try {
@@ -409,6 +395,7 @@ const startTracking = async () => {
 
 const stopTracking = async () => {
   isTracking.value = false;
+  store.isTrackingActive = false;
   try { await TrackingBridge.stopService(); } catch(e) {}
   
   if (motionListenerId) {

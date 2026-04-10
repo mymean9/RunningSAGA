@@ -13,7 +13,7 @@
         :activeTab="activeTab"
         @openAuth="openAuth"
         @logout="handleLogout"
-        @changeTab="(tab) => activeTab = tab"
+        @changeTab="handleTabChange"
       />
       <main class="relative pb-24 md:pb-0">
         <Transition name="fade" mode="out-in">
@@ -46,6 +46,14 @@ const user = computed(() => store.user);
 const openAuth = (mode = 'login') => {
   authMode.value = mode;
   isAuthOpen.value = true;
+};
+
+const handleTabChange = (tab) => {
+  if (store.isTrackingActive && tab !== 'tracker') {
+    const answer = window.confirm('현재 러닝 기록을 측정 중입니다. 무시하고 다른 메뉴로 가시겠습니까? (기록은 백그라운드에서 유지됩니다)');
+    if (!answer) return;
+  }
+  activeTab.value = tab;
 };
 
 const handleLogout = () => {

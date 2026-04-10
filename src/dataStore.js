@@ -50,6 +50,7 @@ export const store = reactive({
   groups: [],
   user: savedUser,
   loading: false,
+  isTrackingActive: false,
 
   async signup(email, password, displayName) {
     this.loading = true;
