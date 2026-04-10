@@ -280,6 +280,7 @@ const requestPermission = async () => {
 
 const openAppSettings = async () => {
   try {
+    alert("안드로이드 시스템 설정(Always Allow)으로 이동합니다.");
     await TrackingBridge.openAppSettings();
   } catch (e) {
     console.error("Native settings open failed", e);

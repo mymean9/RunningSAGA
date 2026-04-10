@@ -38,7 +38,7 @@ public class MainActivity extends BridgeActivity {
 }
 
 @CapacitorPlugin(name = "TrackingBridge")
-class TrackingBridge extends Plugin {
+public class TrackingBridge extends Plugin {
     @PluginMethod
     public void startService(PluginCall call) {
         Context context = getContext();
