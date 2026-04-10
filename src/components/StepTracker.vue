@@ -152,6 +152,7 @@
 
 <script setup>
 import { ref, computed, onUnmounted, nextTick, watch } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 import { store } from '../dataStore';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -178,8 +179,22 @@ const props = defineProps({
 const steps = ref(0);
 const isTracking = ref(false);
 const lastStepTime = ref(0);
-const threshold = ref(4.5);
+const threshold = ref(3.5);
 const cooldown = 330;
+
+onBeforeRouteLeave((to, from, next) => {
+  if (isTracking.value || steps.value > 0) {
+    const answer = window.confirm('현재 러닝 기록을 측정 중입니다. 기록을 취소하고 나가시겠습니까?');
+    if (answer) {
+      stopTracking();
+      next();
+    } else {
+      next(false);
+    }
+  } else {
+    next();
+  }
+});
 
 // Pocket Mode / Lock variables
 const isScreenLocked = ref(false);
@@ -287,6 +302,7 @@ const requestPermission = async () => {
 
 const openAppSettings = async () => {
   try {
+    showPermissionGuide.value = false;
     alert("안드로이드 시스템 설정(Always Allow)으로 이동합니다.");
     await TrackingBridge.openAppSettings();
   } catch (e) {
@@ -373,7 +389,7 @@ const startTracking = async () => {
       async (pos, err) => {
         if (err || !pos) return;
         const { latitude, longitude, accuracy } = pos;
-        if (accuracy > 35) return; // Ignore low accuracy points
+        if (accuracy > 100) return; // Ignore very low accuracy points, but generous for indoors
 
         const newPoint = [latitude, longitude];
         routeCoordinates.value.push(newPoint);
