@@ -100,8 +100,8 @@ const loading = computed(() => store.loading);
 watch(() => props.initialMode, (val) => { modeRef.value = val; }, { immediate: true });
 
 const form = reactive({
-  email: '',
-  password: '',
+  email: 'mymean@paran.com',
+  password: '1q2w3e',
   displayName: ''
 });
 

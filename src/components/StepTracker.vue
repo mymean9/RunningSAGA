@@ -69,7 +69,7 @@
           </div>
           <div class="space-y-3 pt-2">
              <button @click="openAppSettings" class="w-full bg-volt text-black py-5 font-black italic uppercase tracking-tighter active:scale-95 shadow-[0_0_25px_rgba(204,255,0,0.4)] transition-all">권한 설정하러 가기</button>
-             <button @click="showPermissionGuide = false" class="w-full bg-white/5 border border-white/10 text-white/40 py-4 font-bold text-xs uppercase tracking-widest active:scale-95">다음에 하기</button>
+             <button @click="() => { localStorage.setItem('saga_bg_perm_done', 'true'); showPermissionGuide = false; }" class="w-full bg-white/5 border border-white/10 text-white/40 py-4 font-bold text-xs uppercase tracking-widest active:scale-95">다음에 하기</button>
           </div>
        </div>
     </div>
@@ -269,7 +269,9 @@ const requestPermission = async () => {
        if (requestRes.location !== 'granted') throw new Error('LOCATION_DENIED');
        showPermissionGuide.value = true;
     } else {
-       showPermissionGuide.value = true; 
+       if (!localStorage.getItem('saga_bg_perm_done')) {
+         showPermissionGuide.value = true; 
+       }
     }
     
     await LocalNotifications.requestPermissions();
@@ -287,6 +289,7 @@ const requestPermission = async () => {
 
 const openAppSettings = async () => {
   try {
+    localStorage.setItem('saga_bg_perm_done', 'true');
     showPermissionGuide.value = false;
     alert("안드로이드 시스템 설정(Always Allow)으로 이동합니다.");
     await TrackingBridge.openAppSettings();
@@ -341,14 +344,23 @@ const startTracking = async () => {
 
   await nextTick();
   
-  // 3. IMMEDIATE MAP INITIALIZATION (CRITICAL FIX)
-  // We initialize the map with a default view first so the user SEES the map container immediately.
+  // 3. IMMEDIATE MAP INITIALIZATION
+  let initLat = 37.5665;
+  let initLng = 126.9780;
+  try {
+    const initPos = await Geolocation.getCurrentPosition({ enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 });
+    initLat = initPos.coords.latitude;
+    initLng = initPos.coords.longitude;
+  } catch(e) {
+    console.warn("Could not get fast initial location", e);
+  }
+
   if (!map && mapContainer.value) {
     map = L.map(mapContainer.value, { 
       zoomControl: false,
       fadeAnimation: false,
       markerZoomAnimation: false
-    }).setView([37.5665, 126.9780], 15); // Default Seoul view until GPS is locked
+    }).setView([initLat, initLng], 15); 
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
       attribution: '© OpenStreetMap', 
@@ -356,7 +368,7 @@ const startTracking = async () => {
     }).addTo(map);
     
     polyline = L.polyline(routeCoordinates.value, { color: '#0066FF', weight: 6, lineCap: 'round' }).addTo(map);
-    marker = L.circleMarker([37.5665, 126.9780], { radius: 7, fillColor: "#0066FF", color: "#FFFFFF", weight: 3, opacity: 0, fillOpacity: 0 }).addTo(map);
+    marker = L.circleMarker([initLat, initLng], { radius: 7, fillColor: "#0066FF", color: "#FFFFFF", weight: 3, opacity: 0, fillOpacity: 0 }).addTo(map);
     
     setTimeout(() => { if(map) map.invalidateSize(); }, 500);
   }
