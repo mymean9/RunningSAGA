@@ -12,11 +12,21 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 
-public class TrackingService extends Service {
+public class TrackingService extends Service implements SensorEventListener {
     private static final String CHANNEL_ID = "RunningTrackerChannel";
     private static final int NOTIFICATION_ID = 1001;
     private PowerManager.WakeLock wakeLock;
+
+    private SensorManager sensorManager;
+    private Sensor stepSensor;
+    private boolean isInitialStepSet = false;
+    private float initialStepCount = 0;
 
     @Override
     public void onCreate() {
@@ -48,15 +58,51 @@ public class TrackingService extends Service {
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "RunningSAGA:TrackerLock");
         wakeLock.acquire();
 
+        // Register Hardware Step Counter
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager != null) {
+            stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+            if (stepSensor != null) {
+                sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_UI);
+            }
+        }
+
+        // Reset step count for new session
+        isInitialStepSet = false;
+        SharedPreferences prefs = getSharedPreferences("SagaPrefs", Context.MODE_PRIVATE);
+        prefs.edit().putInt("native_steps", 0).apply();
+
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this);
+        }
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+            float totalSteps = event.values[0];
+            if (!isInitialStepSet) {
+                initialStepCount = totalSteps;
+                isInitialStepSet = true;
+            }
+            int currentSessionSteps = (int) (totalSteps - initialStepCount);
+            
+            SharedPreferences prefs = getSharedPreferences("SagaPrefs", Context.MODE_PRIVATE);
+            prefs.edit().putInt("native_steps", currentSessionSteps).apply();
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
     @Nullable

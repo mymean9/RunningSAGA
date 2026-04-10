@@ -200,12 +200,21 @@ let map = null;
 let polyline = null;
 let marker = null;
 let watchId = null;
-let motionListenerId = null;
 
-// Step calculation
-const alpha = 0.8;
-const lastAcc = { x: 0, y: 0, z: 0 };
-const isPeak = ref(false);
+// Native Step Poller
+let nativeStepInterval = null;
+
+const pollNativeSteps = async () => {
+  if (!isTracking.value) return;
+  try {
+    const res = await TrackingBridge.getNativeSteps();
+    if (res && res.steps > 0) {
+      steps.value = res.steps;
+    }
+  } catch (e) {
+    // silently fail until native plugin responds
+  }
+};
 
 const targetDistance = ref(5.0);
 
@@ -239,26 +248,6 @@ watch(distance, (newDist) => {
     }
   }
 });
-
-const handleMotion = (event) => {
-  if (!isTracking.value) return;
-  const acc = event.acceleration || event.accelerationIncludingGravity;
-  if (!acc || acc.x === null) return;
-
-  lastAcc.x = alpha * lastAcc.x + (1 - alpha) * acc.x;
-  lastAcc.y = alpha * lastAcc.y + (1 - alpha) * acc.y;
-  lastAcc.z = alpha * lastAcc.z + (1 - alpha) * acc.z;
-
-  const magnitude = Math.sqrt(lastAcc.x ** 2 + lastAcc.y ** 2 + lastAcc.z ** 2);
-  const now = Date.now();
-  if (magnitude > threshold.value && !isPeak.value && (now - lastStepTime.value) > cooldown) {
-    isPeak.value = true;
-    steps.value++;
-    lastStepTime.value = now;
-  } else if (magnitude < threshold.value * 0.7) {
-    isPeak.value = false;
-  }
-};
 
 // PERMISSIONS
 const requestPermission = async () => {
@@ -337,9 +326,9 @@ const startTracking = async () => {
     await TrackingBridge.startService();
   } catch (e) { console.error("Native Bridge Start Failed:", e); }
 
-  // 2. Start Steps (Motion)
-  if (!motionListenerId) {
-    motionListenerId = await Motion.addListener('accel', handleMotion);
+  // 2. Start Steps (Native Poller)
+  if (!nativeStepInterval) {
+    nativeStepInterval = setInterval(pollNativeSteps, 1500);
   }
 
   await nextTick();
@@ -410,9 +399,9 @@ const stopTracking = async () => {
   store.isTrackingActive = false;
   try { await TrackingBridge.stopService(); } catch(e) {}
   
-  if (motionListenerId) {
-    Motion.removeAllListeners();
-    motionListenerId = null;
+  if (nativeStepInterval) {
+    clearInterval(nativeStepInterval);
+    nativeStepInterval = null;
   }
   if (watchId) {
     const BG = await getBackgroundGeolocation();

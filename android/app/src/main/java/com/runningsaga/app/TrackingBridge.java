@@ -9,6 +9,8 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.JSObject;
+import android.content.SharedPreferences;
 
 @CapacitorPlugin(name = "TrackingBridge")
 public class TrackingBridge extends Plugin {
@@ -51,6 +53,20 @@ public class TrackingBridge extends Plugin {
             call.resolve();
         } catch (Exception e) {
             call.reject("Open Settings Failed: " + e.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void getNativeSteps(PluginCall call) {
+        try {
+            SharedPreferences prefs = getContext().getSharedPreferences("SagaPrefs", Context.MODE_PRIVATE);
+            int steps = prefs.getInt("native_steps", 0);
+            
+            JSObject ret = new JSObject();
+            ret.put("steps", steps);
+            call.resolve(ret);
+        } catch (Exception e) {
+            call.reject("Get Steps Failed: " + e.getMessage());
         }
     }
 }
