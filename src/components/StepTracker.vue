@@ -284,6 +284,7 @@ const openAppSettings = async () => {
     await TrackingBridge.openAppSettings();
   } catch (e) {
     console.error("Native settings open failed", e);
+    alert("설정 화면을 열지 못했습니다: " + (e.message || "알 수 없는 오류"));
     // Fallback to plugin if native fails
     const BG = await getBackgroundGeolocation();
     await BG.openSettings();
