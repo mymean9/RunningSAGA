@@ -412,22 +412,36 @@ const stopTracking = async () => {
 
 const finishSession = async () => {
   if (steps.value > 0 && props.currentUser) {
-    const captureEl = document.getElementById("capture-area");
-    if (captureEl) {
-      const canvas = await html2canvas(captureEl, { useCORS: true, backgroundColor: "#000000" });
-      const imgData = canvas.toDataURL("image/png");
-      const a = document.createElement("a");
-      a.href = imgData; a.download = `SAGA_Run.png`;
-      a.click();
+    let imgData = null;
+    try {
+      const captureEl = document.getElementById("capture-area");
+      if (captureEl) {
+        const canvas = await html2canvas(captureEl, { useCORS: true, backgroundColor: "#000000" });
+        imgData = canvas.toDataURL("image/png");
+      }
+    } catch (e) {
+      console.warn("지도 캡처 실패:", e);
     }
-    store.addRun({
-      name: props.currentUser.name,
-      distance: distance.value,
-      pace: "AUTO",
-      date: new Date().toISOString(),
-      route: [...routeCoordinates.value]
-    });
+    
+    try {
+      await store.addRun({
+        name: props.currentUser.name,
+        distance: distance.value,
+        pace: "AUTO",
+        date: new Date().toISOString(),
+        route: [...routeCoordinates.value],
+        image: imgData
+      });
+      alert("성공적으로 기록이 저장되었습니다! 대시보드에서 확인해 보세요.");
+    } catch (e) {
+      alert("저장 중 오류가 발생했습니다: " + e.message);
+    }
+  } else if (!props.currentUser) {
+    alert("로그인이 필요합니다.");
+  } else {
+    alert("저장할 걸음 또는 거리가 없습니다.");
   }
+  
   steps.value = 0; routeCoordinates.value = [];
   if (map) { map.remove(); map = null; }
   stopTracking();
