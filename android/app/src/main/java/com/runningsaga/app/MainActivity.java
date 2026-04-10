@@ -17,8 +17,8 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         registerPlugin(TrackingBridge.class);
+        super.onCreate(savedInstanceState);
         createNotificationChannel();
     }
 

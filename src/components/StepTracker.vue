@@ -299,16 +299,25 @@ const openAppSettings = async () => {
 };
 
 const toggleMapFullscreen = async () => {
-  isMapFullscreen.value = !isMapFullscreen.value;
-  await nextTick();
-  
   if (map) {
-    const newContainer = isMapFullscreen.value ? fullscreenMapContainer.value : mapContainer.value;
-    if (newContainer) {
-      const mapDiv = map.getContainer();
-      newContainer.appendChild(mapDiv);
+    if (isMapFullscreen.value) {
+      // Shrinking: Move map BACK to the small container BEFORE removing the full screen overlay
+      if (mapContainer.value) {
+        mapContainer.value.appendChild(map.getContainer());
+      }
+      isMapFullscreen.value = false;
+      setTimeout(() => { map.invalidateSize(); }, 300);
+    } else {
+      // Expanding: Show full screen overlay FIRST, then move the map
+      isMapFullscreen.value = true;
+      await nextTick();
+      if (fullscreenMapContainer.value) {
+        fullscreenMapContainer.value.appendChild(map.getContainer());
+      }
       setTimeout(() => { map.invalidateSize(); }, 300);
     }
+  } else {
+    isMapFullscreen.value = !isMapFullscreen.value;
   }
 };
 
