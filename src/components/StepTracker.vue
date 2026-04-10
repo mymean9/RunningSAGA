@@ -26,16 +26,23 @@
     <!-- FULLSCREEN MAP OVERLAY -->
     <div 
       v-if="isMapFullscreen" 
-      class="fixed inset-0 z-[90] bg-black flex flex-col animate-fade-in"
+      class="fixed inset-0 z-[120] bg-black flex flex-col animate-fade-in pt-safe md:pt-0"
     >
-       <div class="p-4 flex justify-between items-center bg-zinc-900 border-b border-white/10">
+       <div class="px-4 py-4 md:py-4 mt-8 md:mt-0 flex justify-between items-center bg-zinc-900 border-b border-white/10">
           <p class="text-volt font-black italic tracking-tighter uppercase leading-none">SAGA REALTIME MAP</p>
           <button @click="toggleMapFullscreen" class="w-10 h-10 bg-white/10 flex items-center justify-center rounded-full hover:bg-white/20 active:scale-95 transition-all">
              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
        </div>
-       <div ref="fullscreenMapContainer" class="flex-1 bg-zinc-800"></div>
-       <div class="p-6 bg-zinc-900 border-t border-white/10 grid grid-cols-2 gap-8 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+       <div class="relative flex-1 bg-zinc-800 isolate">
+          <div ref="fullscreenMapContainer" class="absolute inset-0 w-full h-full z-[5]"></div>
+          
+          <button @click="toggleMapFullscreen" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-[20] bg-volt text-black px-6 py-3 rounded-full font-black italic tracking-tighter uppercase shadow-[0_0_20px_rgba(204,255,0,0.4)] flex items-center space-x-2 active:scale-[0.98] transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"></path><path d="M20 10h-6V4"></path><path d="M14 10l7-7"></path><path d="M3 21l7-7"></path></svg>
+            <span>MINIMIZE MAP</span>
+          </button>
+       </div>
+       <div class="p-6 bg-zinc-900 border-t border-white/10 grid grid-cols-2 gap-8 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] z-10 relative">
           <div class="text-center">
              <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1 font-sans">DISTANCE</p>
              <p class="text-3xl font-black italic text-white">{{ distance.toFixed(2) }} <span class="text-xs text-white/40">KM</span></p>
