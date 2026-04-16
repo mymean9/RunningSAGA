@@ -113,7 +113,9 @@
        <div class="w-full px-4 mb-2 cursor-pointer group" @click="toggleMapFullscreen">
           <div class="relative w-full h-48 bg-zinc-900 border border-white/10 rounded-sm overflow-hidden isolate shadow-2xl">
              <!-- The actual map div -->
-             <div ref="mapContainer" class="absolute inset-0 w-full h-full z-[5]"></div>
+             <div ref="mapWrapper" class="absolute inset-0 w-full h-full z-[5]">
+                <div ref="mapContainer" class="w-full h-full"></div>
+             </div>
              
              <!-- Overlay UI -->
              <div class="absolute top-3 right-3 z-[20] bg-black/60 p-2.5 rounded-full border border-white/10 opacity-60 group-hover:opacity-100 group-hover:bg-volt group-hover:text-black transition-all">
@@ -193,6 +195,7 @@ let unlockInterval = null;
 const showPermissionGuide = ref(false);
 
 // Map States & Variables
+const mapWrapper = ref(null);
 const mapContainer = ref(null);
 const fullscreenMapContainer = ref(null);
 const routeCoordinates = ref([]);
@@ -295,18 +298,18 @@ const openAppSettings = async () => {
 const toggleMapFullscreen = async () => {
   if (map) {
     if (isMapFullscreen.value) {
-      // Shrinking: Move map BACK to the small container BEFORE removing the full screen overlay
-      if (mapContainer.value) {
-        mapContainer.value.appendChild(map.getContainer());
+      // Shrinking: Move map wrapper BACK to the small container BEFORE removing the full screen overlay
+      if (mapWrapper.value && mapContainer.value) {
+        mapWrapper.value.appendChild(mapContainer.value);
       }
       isMapFullscreen.value = false;
       setTimeout(() => { map.invalidateSize(); }, 300);
     } else {
-      // Expanding: Show full screen overlay FIRST, then move the map
+      // Expanding: Show full screen overlay FIRST, then move the map wrapper
       isMapFullscreen.value = true;
       await nextTick();
-      if (fullscreenMapContainer.value) {
-        fullscreenMapContainer.value.appendChild(map.getContainer());
+      if (fullscreenMapContainer.value && mapContainer.value) {
+        fullscreenMapContainer.value.appendChild(mapContainer.value);
       }
       setTimeout(() => { map.invalidateSize(); }, 300);
     }
