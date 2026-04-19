@@ -330,13 +330,6 @@ const centerOnMe = () => {
   }
 };
 
-const centerOnMe = () => {
-  if (map && routeCoordinates.value.length > 0) {
-    const lastPoint = routeCoordinates.value[routeCoordinates.value.length - 1];
-    map.setView(lastPoint, 16, { animate: true, duration: 0.5 });
-  }
-};
-
 // TRACKING ENGINE
 const startTracking = async () => {
   if (steps.value === 0) speak("러닝 사가 측정을 시작합니다.");
