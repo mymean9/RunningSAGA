@@ -364,7 +364,8 @@ const startTracking = async () => {
     }).addTo(map);
     
     polyline = L.polyline(routeCoordinates.value, { color: '#CCFF00', weight: 8, lineCap: 'round', lineJoin: 'round', opacity: 0.9 }).addTo(map);
-    marker = L.circleMarker([initLat, initLng], { radius: 8, fillColor: "#CCFF00", color: "#FFFFFF", weight: 3, opacity: hasValidInitPos ? 1 : 0, fillOpacity: hasValidInitPos ? 1 : 0 }).addTo(map);
+    // Always make the marker visible so the user knows measuring has started, even if GPS isn't perfectly locked yet
+    marker = L.circleMarker([initLat, initLng], { radius: 8, fillColor: "#CCFF00", color: "#FFFFFF", weight: 3, opacity: 1, fillOpacity: 1 }).addTo(map);
     
     setTimeout(() => { if(map) map.invalidateSize(); }, 500);
   }
@@ -383,7 +384,10 @@ const startTracking = async () => {
       async (pos, err) => {
         if (err || !pos) return;
         const { latitude, longitude, accuracy } = pos;
-        if (accuracy > 200) return; // More inclusive threshold for start/indoors
+        
+        // Remove strict accuracy limit to prevent trajectory from failing to draw on devices with spotty GPS
+        // We will accept any accuracy < 500 to ensure we at least get a path
+        if (accuracy > 500) return; 
 
         const newPoint = [latitude, longitude];
         routeCoordinates.value.push(newPoint);
