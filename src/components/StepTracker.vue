@@ -340,10 +340,13 @@ const startTracking = async () => {
   // 3. IMMEDIATE MAP INITIALIZATION
   let initLat = 37.5665;
   let initLng = 126.9780;
+  let hasValidInitPos = false;
   try {
     const initPos = await Geolocation.getCurrentPosition({ enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 });
     initLat = initPos.coords.latitude;
     initLng = initPos.coords.longitude;
+    hasValidInitPos = true;
+    routeCoordinates.value.push([initLat, initLng]);
   } catch(e) {
     console.warn("Could not get fast initial location", e);
   }
@@ -361,7 +364,7 @@ const startTracking = async () => {
     }).addTo(map);
     
     polyline = L.polyline(routeCoordinates.value, { color: '#CCFF00', weight: 8, lineCap: 'round', lineJoin: 'round', opacity: 0.9 }).addTo(map);
-    marker = L.circleMarker([initLat, initLng], { radius: 8, fillColor: "#CCFF00", color: "#FFFFFF", weight: 3, opacity: 0, fillOpacity: 0 }).addTo(map);
+    marker = L.circleMarker([initLat, initLng], { radius: 8, fillColor: "#CCFF00", color: "#FFFFFF", weight: 3, opacity: hasValidInitPos ? 1 : 0, fillOpacity: hasValidInitPos ? 1 : 0 }).addTo(map);
     
     setTimeout(() => { if(map) map.invalidateSize(); }, 500);
   }
@@ -375,7 +378,7 @@ const startTracking = async () => {
         backgroundMessage: "백그라운드에서 실시간 기록 중입니다.",
         requestPermissions: true,
         stale: false,
-        distanceFilter: 5
+        distanceFilter: 2
       },
       async (pos, err) => {
         if (err || !pos) return;
