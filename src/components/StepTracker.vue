@@ -37,6 +37,11 @@
        <div class="relative flex-1 bg-zinc-800 isolate">
           <div ref="fullscreenMapContainer" class="absolute inset-0 w-full h-full z-[5]"></div>
           
+          <!-- My Location Button (Crosshairs) -->
+          <button @click="centerOnMe" class="absolute bottom-28 right-6 z-[1000] w-14 h-14 bg-zinc-900 border-2 border-volt text-volt rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(204,255,0,0.3)] hover:bg-volt hover:text-black active:scale-95 transition-all cursor-pointer">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v3"></path><path d="M12 19v3"></path><path d="M2 12h3"></path><path d="M19 12h3"></path><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg>
+          </button>
+          
           <button @click="toggleMapFullscreen" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-[1000] bg-volt text-black px-8 py-4 rounded-full font-black italic tracking-tighter uppercase shadow-[0_0_30px_rgba(204,255,0,0.5)] flex items-center space-x-2 active:scale-[0.95] transition-all cursor-pointer">
              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"></path><path d="M20 10h-6V4"></path><path d="M14 10l7-7"></path><path d="M3 21l7-7"></path></svg>
              <span class="text-lg text-black font-black uppercase">MINIMIZE MAP</span>
@@ -315,6 +320,20 @@ const toggleMapFullscreen = async () => {
     }
   } else {
     isMapFullscreen.value = !isMapFullscreen.value;
+  }
+};
+
+const centerOnMe = () => {
+  if (map && routeCoordinates.value.length > 0) {
+    const lastPoint = routeCoordinates.value[routeCoordinates.value.length - 1];
+    map.setView(lastPoint, 16, { animate: true, duration: 0.5 });
+  }
+};
+
+const centerOnMe = () => {
+  if (map && routeCoordinates.value.length > 0) {
+    const lastPoint = routeCoordinates.value[routeCoordinates.value.length - 1];
+    map.setView(lastPoint, 16, { animate: true, duration: 0.5 });
   }
 };
 
