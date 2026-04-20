@@ -71,6 +71,12 @@
       <div v-if="runners.length === 0" class="text-center py-20">
          <p class="text-2xl font-black italic text-white/20 uppercase tracking-tighter">NO RUNNERS JOINED YET. BE THE FIRST!</p>
       </div>
+
+      <!-- BUILD VERSION INDICATOR -->
+      <div class="mt-16 text-center">
+         <p class="text-[10px] font-bold text-white/20 tracking-[0.3em] uppercase">Running.SAGA Build v1.0.2</p>
+         <p class="text-[8px] text-white/10 mt-1">2026-04-20 Update</p>
+      </div>
     </div>
 
     <!-- LOG RUN MODAL -->
