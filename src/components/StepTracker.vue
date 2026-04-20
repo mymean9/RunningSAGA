@@ -382,23 +382,15 @@ const startTracking = async () => {
     setTimeout(() => { if(map) map.invalidateSize(); }, 500);
   }
 
-  // 4. Start GPS (Open Source Watcher)
+  // 4. Start GPS (Standard Watcher supported by Foreground Service)
   try {
-    const BG = await getBackgroundGeolocation();
-    watchId = await BG.addWatcher(
-      { 
-        backgroundTitle: "🏃‍♂️ Running SAGA Tracking",
-        backgroundMessage: "백그라운드에서 실시간 기록 중입니다.",
-        requestPermissions: true,
-        stale: false,
-        distanceFilter: 2
-      },
-      async (pos, err) => {
-        if (err || !pos) return;
-        const { latitude, longitude, accuracy } = pos;
+    watchId = await Geolocation.watchPosition(
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+      (pos, err) => {
+        if (err || !pos || !pos.coords) return;
+        const { latitude, longitude, accuracy } = pos.coords;
         
-        // Remove strict accuracy limit to prevent trajectory from failing to draw on devices with spotty GPS
-        // We will accept any accuracy < 500 to ensure we at least get a path
+        // Assume < 500m precision is acceptable to draw points
         if (accuracy > 500) return; 
 
         const newPoint = [latitude, longitude];
@@ -427,8 +419,7 @@ const stopTracking = async () => {
     nativeStepInterval = null;
   }
   if (watchId) {
-    const BG = await getBackgroundGeolocation();
-    await BG.removeWatcher({ id: watchId });
+    await Geolocation.clearWatch({ id: watchId });
     watchId = null;
   }
 };
