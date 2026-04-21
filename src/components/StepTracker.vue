@@ -1,28 +1,6 @@
 <template>
   <div class="min-h-[calc(100vh-80px)] bg-black flex flex-col items-center justify-center p-6 text-white overflow-hidden relative font-sans">
     
-    <!-- POCKET MODE OVERLAY -->
-    <div 
-      v-if="isScreenLocked" 
-      class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center select-none"
-      @touchstart.prevent="handleUnlockStart"
-      @touchend="handleUnlockEnd"
-      @touchcancel="handleUnlockEnd"
-      @touchmove="handleUnlockEnd"
-      @mousedown="handleUnlockStart"
-      @mouseup="handleUnlockEnd"
-      @mouseleave="handleUnlockEnd"
-    >
-       <div class="relative w-32 h-32 flex justify-center items-center">
-         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/20"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-         <svg class="absolute inset-0 w-full h-full -rotate-90">
-            <circle cx="64" cy="64" r="56" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
-            <circle cx="64" cy="64" r="56" fill="none" stroke="#CCFF00" stroke-width="4" stroke-dasharray="351.86" :stroke-dashoffset="351.86 - (351.86 * unlockProgress / 100)" class="transition-all duration-75 ease-linear"></circle>
-         </svg>
-       </div>
-       <p class="text-white/40 font-bold tracking-widest text-xs mt-8 uppercase">HOLD TO UNLOCK</p>
-    </div>
-
     <!-- FULLSCREEN MAP OVERLAY -->
     <div 
       v-if="isMapFullscreen" 
@@ -144,13 +122,13 @@
 
        <!-- ACTION CONTROLS -->
        <div class="flex flex-col w-full px-4 space-y-4 pb-12">
-          <div v-if="isTracking" class="grid grid-cols-2 gap-4">
-             <button @click="enablePocketMode" class="bg-white/5 border border-white/10 text-white/50 py-4 font-bold text-[10px] uppercase tracking-widest active:bg-white/10 transition-colors">POCKET MODE</button>
-             <button @click="stopTracking" class="bg-white text-black py-4 font-black italic text-lg uppercase tracking-tighter active:scale-[0.98] transition-all">PAUSE RUN</button>
+          <div v-if="isTracking" class="w-full">
+             <button @click="stopTracking" class="w-full bg-white text-black py-4 font-black italic text-xl uppercase tracking-tighter active:scale-[0.98] transition-all">PAUSE RUN</button>
           </div>
-          <div v-else class="flex space-x-4">
-             <button @click="startTracking" class="flex-1 bg-volt text-black py-5 font-black italic text-xl uppercase tracking-tighter active:scale-[0.98] transition-all">RESUME</button>
-             <button @click="finishSession" class="flex-1 border-2 border-white text-white py-5 font-black italic text-xl uppercase tracking-tighter active:scale-[0.98] transition-all">FINISH</button>
+          <div v-else class="flex space-x-2">
+             <button @click="startTracking" class="flex-1 bg-volt text-black py-4 font-black italic text-sm uppercase tracking-tighter active:scale-[0.98] transition-all">RESUME</button>
+             <button @click="finishSession" class="flex-1 border-2 border-white text-white py-4 font-black italic text-sm uppercase tracking-tighter active:scale-[0.98] transition-all">SAVE</button>
+             <button @click="discardSession" class="flex-1 border border-red-500/50 text-red-500 py-4 font-black italic text-sm uppercase tracking-tighter active:scale-[0.98] transition-all">DISCARD</button>
           </div>
        </div>
     </div>
@@ -189,12 +167,13 @@ const lastStepTime = ref(0);
 const threshold = ref(3.5);
 const cooldown = 330;
 
-// Pocket Mode / Lock variables
-const isScreenLocked = ref(false);
-const wakeLock = ref(null);
-const unlockProgress = ref(0);
-let unlockTimer = null;
-let unlockInterval = null;
+const discardSession = () => {
+  if(confirm("기록을 저장하지 않고 모두 지우시겠습니까?")) {
+    steps.value = 0; routeCoordinates.value = [];
+    if (map) { map.remove(); map = null; }
+    stopTracking();
+  }
+};
 
 // Permission UI
 const showPermissionGuide = ref(false);
@@ -352,16 +331,6 @@ const startTracking = async () => {
   // 3. IMMEDIATE MAP INITIALIZATION
   let initLat = 37.5665;
   let initLng = 126.9780;
-  let hasValidInitPos = false;
-  try {
-    const initPos = await Geolocation.getCurrentPosition({ enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 });
-    initLat = initPos.coords.latitude;
-    initLng = initPos.coords.longitude;
-    hasValidInitPos = true;
-    routeCoordinates.value.push([initLat, initLng]);
-  } catch(e) {
-    console.warn("Could not get fast initial location", e);
-  }
 
   if (!map && mapContainer.value) {
     map = L.map(mapContainer.value, { 
@@ -376,10 +345,24 @@ const startTracking = async () => {
     }).addTo(map);
     
     polyline = L.polyline(routeCoordinates.value, { color: '#CCFF00', weight: 8, lineCap: 'round', lineJoin: 'round', opacity: 0.9 }).addTo(map);
-    // Always make the marker visible so the user knows measuring has started, even if GPS isn't perfectly locked yet
-    marker = L.circleMarker([initLat, initLng], { radius: 8, fillColor: "#CCFF00", color: "#FFFFFF", weight: 3, opacity: 1, fillOpacity: 1 }).addTo(map);
+    // Setup invisible marker initially until real location arrives
+    marker = L.circleMarker([initLat, initLng], { radius: 8, fillColor: "#CCFF00", color: "#FFFFFF", weight: 3, opacity: 0, fillOpacity: 0 }).addTo(map);
     
     setTimeout(() => { if(map) map.invalidateSize(); }, 500);
+
+    // Fast asynchronous location request to update the initially grey/seoul map
+    Geolocation.getCurrentPosition({ enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 })
+      .then(pos => {
+        initLat = pos.coords.latitude;
+        initLng = pos.coords.longitude;
+        routeCoordinates.value.push([initLat, initLng]);
+        if (map) {
+          marker.setLatLng([initLat, initLng]);
+          marker.setStyle({ opacity: 1, fillOpacity: 1 });
+          map.setView([initLat, initLng], 15);
+        }
+      })
+      .catch(e => console.warn("Could not get fast initial location", e));
   }
 
   // 4. Start GPS (Standard Watcher supported by Foreground Service)
@@ -460,16 +443,6 @@ const finishSession = async () => {
   if (map) { map.remove(); map = null; }
   stopTracking();
 };
-
-const handleUnlockStart = () => {
-  unlockProgress.value = 0;
-  clearInterval(unlockInterval);
-  clearTimeout(unlockTimer);
-  unlockInterval = setInterval(() => { if (unlockProgress.value < 100) unlockProgress.value += 5; }, 50);
-  unlockTimer = setTimeout(() => { isScreenLocked.value = false; unlockProgress.value = 0; clearInterval(unlockInterval); }, 1000);
-};
-
-const handleUnlockEnd = () => { clearInterval(unlockInterval); clearTimeout(unlockTimer); setTimeout(() => { if (isScreenLocked.value) unlockProgress.value = 0; }, 50); };
 
 // Android Back Button Handler
 let backButtonListener = null;
