@@ -376,7 +376,18 @@ const startTracking = async () => {
         // Assume < 500m precision is acceptable to draw points
         if (accuracy > 500) return; 
 
-        const newPoint = [latitude, longitude];
+        let smoothedLat = latitude;
+        let smoothedLng = longitude;
+
+        if (routeCoordinates.value.length > 0) {
+          const lastPoint = routeCoordinates.value[routeCoordinates.value.length - 1];
+          // EMA (Exponential Moving Average) smoothing
+          const alpha = 0.35; // Lower is smoother
+          smoothedLat = lastPoint[0] + alpha * (latitude - lastPoint[0]);
+          smoothedLng = lastPoint[1] + alpha * (longitude - lastPoint[1]);
+        }
+
+        const newPoint = [smoothedLat, smoothedLng];
         routeCoordinates.value.push(newPoint);
 
         if (map) {
