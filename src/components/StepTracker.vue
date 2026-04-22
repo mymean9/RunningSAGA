@@ -157,6 +157,20 @@ const getBackgroundGeolocation = async () => {
   return (await import('@capacitor-community/background-geolocation')).BackgroundGeolocation;
 };
 
+// Haversine formula for distance between coordinates in meters
+const calculateDistanceMeters = (lat1, lon1, lat2, lon2) => {
+  const R = 6371e3; // metres
+  const φ1 = lat1 * Math.PI/180;
+  const φ2 = lat2 * Math.PI/180;
+  const Δφ = (lat2-lat1) * Math.PI/180;
+  const Δλ = (lon2-lon1) * Math.PI/180;
+  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+};
+
 const props = defineProps({
   currentUser: Object
 });
@@ -373,21 +387,20 @@ const startTracking = async () => {
         if (err || !pos || !pos.coords) return;
         const { latitude, longitude, accuracy } = pos.coords;
         
-        // Assume < 500m precision is acceptable to draw points
-        if (accuracy > 500) return; 
+        // Strict accuracy filter to entirely drop GPS bounces
+        // Ignore locations with worse than 40m precision (very normal bounds for smartphones)
+        if (accuracy > 40) return; 
 
-        let smoothedLat = latitude;
-        let smoothedLng = longitude;
-
+        // Apply a Distance Threshold (Minimum Distance Filter)
         if (routeCoordinates.value.length > 0) {
           const lastPoint = routeCoordinates.value[routeCoordinates.value.length - 1];
-          // EMA (Exponential Moving Average) smoothing
-          const alpha = 0.35; // Lower is smoother
-          smoothedLat = lastPoint[0] + alpha * (latitude - lastPoint[0]);
-          smoothedLng = lastPoint[1] + alpha * (longitude - lastPoint[1]);
+          const dist = calculateDistanceMeters(lastPoint[0], lastPoint[1], latitude, longitude);
+          
+          // Drop point if the user moved less than 6 meters (filters out jitter when stopping or walking slowly)
+          if (dist < 6) return;
         }
 
-        const newPoint = [smoothedLat, smoothedLng];
+        const newPoint = [latitude, longitude];
         routeCoordinates.value.push(newPoint);
 
         if (map) {
