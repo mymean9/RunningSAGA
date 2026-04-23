@@ -176,6 +176,7 @@ const props = defineProps({
 });
 
 const steps = ref(0);
+const gpsDistance = ref(0);
 const isTracking = ref(false);
 const lastStepTime = ref(0);
 const threshold = ref(3.5);
@@ -183,7 +184,9 @@ const cooldown = 330;
 
 const discardSession = () => {
   if(confirm("기록을 저장하지 않고 모두 지우시겠습니까?")) {
-    steps.value = 0; routeCoordinates.value = [];
+    steps.value = 0; 
+    gpsDistance.value = 0;
+    routeCoordinates.value = [];
     if (map) { map.remove(); map = null; }
     stopTracking();
   }
@@ -220,7 +223,7 @@ const pollNativeSteps = async () => {
 
 const targetDistance = ref(5.0);
 
-const distance = computed(() => (steps.value * 0.00075)); 
+const distance = computed(() => (gpsDistance.value / 1000)); 
 const calories = computed(() => Math.floor(steps.value * 0.04));
 const goalProgress = computed(() => Math.min(100, (distance.value / targetDistance.value) * 100));
 
@@ -398,6 +401,9 @@ const startTracking = async () => {
           
           // Drop point if the user moved less than 6 meters (filters out jitter when stopping or walking slowly)
           if (dist < 6) return;
+          
+          // Accumulate actual real-world GPS distance
+          gpsDistance.value += dist;
         }
 
         const newPoint = [latitude, longitude];
@@ -463,7 +469,9 @@ const finishSession = async () => {
     alert("저장할 걸음 또는 거리가 없습니다.");
   }
   
-  steps.value = 0; routeCoordinates.value = [];
+  steps.value = 0; 
+  gpsDistance.value = 0;
+  routeCoordinates.value = [];
   if (map) { map.remove(); map = null; }
   stopTracking();
 };
