@@ -65,7 +65,7 @@
                   
                   <div>
                     <p class="text-xs font-bold text-white/40 uppercase tracking-widest">{{ act.date }}</p>
-                    <p class="text-3xl font-black italic text-white tracking-tighter">{{ act.distance }} <span class="text-sm text-volt font-bold uppercase tracking-wider">KM</span></p>
+                    <p class="text-3xl font-black italic text-white tracking-tighter">{{ Number(act.distance).toFixed(2) }} <span class="text-sm text-volt font-bold uppercase tracking-wider">KM</span></p>
                   </div>
                 </div>
                 
@@ -97,7 +97,7 @@
            <div class="flex justify-between items-end mb-6">
               <div>
                  <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">{{ selectedActivity.date }}</p>
-                 <p class="text-4xl font-black italic text-white tracking-tighter">{{ selectedActivity.distance }} <span class="text-lg text-volt font-bold uppercase">KM</span></p>
+                 <p class="text-4xl font-black italic text-white tracking-tighter">{{ Number(selectedActivity.distance).toFixed(2) }} <span class="text-lg text-volt font-bold uppercase">KM</span></p>
               </div>
               <div class="text-right">
                  <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">PACE</p>

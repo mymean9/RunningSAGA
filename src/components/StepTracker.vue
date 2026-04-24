@@ -373,8 +373,8 @@ const startTracking = async () => {
           const lastPoint = routeCoordinates.value[routeCoordinates.value.length - 1];
           const dist = calculateDistanceMeters(lastPoint[0], lastPoint[1], latitude, longitude);
           
-          // Drop point if the user moved less than 6 meters (filters out jitter when stopping or walking slowly)
-          if (dist < 6) return;
+          // Drop point if the user moved less than 10 meters (filters out jitter when stopping or walking slowly)
+          if (dist < 10) return;
           
           // Accumulate actual real-world GPS distance
           gpsDistance.value += dist;
