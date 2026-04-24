@@ -37,25 +37,7 @@
        </div>
     </div>
 
-    <!-- BACKGROUND LOCATION GUIDE MODAL -->
-    <div v-if="showPermissionGuide" class="fixed inset-0 z-[110] bg-black/90 flex items-center justify-center p-6 backdrop-blur-md animate-fade-in">
-       <div class="bg-zinc-900 border border-volt/30 p-8 rounded-sm max-w-sm w-full space-y-6 shadow-2xl">
-          <div class="relative">
-             <div class="absolute inset-0 bg-volt/20 blur-xl rounded-full"></div>
-             <div class="relative w-20 h-20 bg-volt/10 border border-volt/50 rounded-full flex items-center justify-center text-volt mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-             </div>
-          </div>
-          <div class="text-center space-y-3">
-             <h3 class="text-2xl font-black italic tracking-tighter uppercase leading-tight text-white whitespace-pre-line">백그라운드 기록을 위해<br/><span class="text-volt">"항상 허용"</span>이 필요합니다</h3>
-             <p class="text-white/40 text-[13px] leading-relaxed">화면을 끄거나 다른 앱을 사용 중일 때도 기록이 중단되지 않으려면, 위치 권한을 반드시 <span class="text-white font-bold">"항상 허용(Allow all the time)"</span>으로 설정해야 합니다.</p>
-          </div>
-          <div class="space-y-3 pt-2">
-             <button @click="openAppSettings" class="w-full bg-volt text-black py-5 font-black italic uppercase tracking-tighter active:scale-95 shadow-[0_0_25px_rgba(204,255,0,0.4)] transition-all">권한 설정하러 가기</button>
-             <button @click="() => { localStorage.setItem('saga_bg_perm_done', 'true'); showPermissionGuide = false; }" class="w-full bg-white/5 border border-white/10 text-white/40 py-4 font-bold text-xs uppercase tracking-widest active:scale-95">다음에 하기</button>
-          </div>
-       </div>
-    </div>
+
 
     <!-- START SCREEN -->
     <div v-if="!isTracking && steps === 0" class="text-center space-y-12 max-w-sm animate-fade-in">
@@ -192,8 +174,7 @@ const discardSession = () => {
   }
 };
 
-// Permission UI
-const showPermissionGuide = ref(false);
+
 
 // Map States & Variables
 const mapWrapper = ref(null);
@@ -261,11 +242,6 @@ const requestPermission = async () => {
     if (geoStatus.location !== 'granted') {
        const requestRes = await Geolocation.requestPermissions();
        if (requestRes.location !== 'granted') throw new Error('LOCATION_DENIED');
-       showPermissionGuide.value = true;
-    } else {
-       if (!localStorage.getItem('saga_bg_perm_done')) {
-         showPermissionGuide.value = true; 
-       }
     }
     
     await LocalNotifications.requestPermissions();
@@ -283,9 +259,7 @@ const requestPermission = async () => {
 
 const openAppSettings = async () => {
   try {
-    localStorage.setItem('saga_bg_perm_done', 'true');
-    showPermissionGuide.value = false;
-    alert("안드로이드 시스템 설정(Always Allow)으로 이동합니다.");
+    alert("안드로이드 시스템 설정으로 이동합니다. 위치 권한을 확인해 주세요.");
     await TrackingBridge.openAppSettings();
   } catch (e) {
     console.error("Native settings open failed", e);
