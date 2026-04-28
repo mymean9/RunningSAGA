@@ -97,7 +97,7 @@
            </div>
            
            <div class="w-full flex-1 min-h-[250px] md:min-h-[400px] border border-white/10 relative overflow-hidden bg-[#111111] group">
-              <div v-if="selectedActivity.route && selectedActivity.route.length > 0" class="absolute inset-0 z-0">
+              <div v-if="selectedActivity.route && selectedActivity.route.length > 0" class="absolute inset-0 z-0 map-normal-view">
                  <div ref="mapContainer" class="w-full h-full"></div>
                  
                  <!-- Map Controls Overlay -->
@@ -247,16 +247,31 @@ const toggleMapFullscreen = async () => {
   if (isMapFullscreen.value) {
     isMapFullscreen.value = false;
     await nextTick();
-    if (mapContainer.value) {
-      // Re-attach to small container if needed (though mapContainer ref should stay on the DOM element)
-      setTimeout(() => { mapInstance.invalidateSize(); }, 300);
+    
+    // Move mapContainer back to the small view
+    // We search for the specific container div in the normal view
+    const normalParent = document.querySelector('.map-normal-view');
+    if (normalParent && mapContainer.value) {
+      normalParent.prepend(mapContainer.value);
     }
+    
+    setTimeout(() => { 
+      if (mapInstance) {
+        mapInstance.invalidateSize();
+        if (polylineInstance) mapInstance.fitBounds(polylineInstance.getBounds(), { padding: [40, 40] });
+      }
+    }, 300);
   } else {
     isMapFullscreen.value = true;
     await nextTick();
     if (fullscreenMapContainer.value && mapContainer.value) {
       fullscreenMapContainer.value.appendChild(mapContainer.value);
-      setTimeout(() => { mapInstance.invalidateSize(); }, 300);
+      setTimeout(() => { 
+        if (mapInstance) {
+          mapInstance.invalidateSize();
+          if (polylineInstance) mapInstance.fitBounds(polylineInstance.getBounds(), { padding: [40, 40] });
+        }
+      }, 300);
     }
   }
 };
@@ -304,9 +319,9 @@ onUnmounted(() => {
   z-index: 1;
 }
 
-/* :deep(.leaflet-tile-pane) {
+:deep(.leaflet-tile-pane) {
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-} */
+}
 
 @keyframes fade-in {
   from { opacity: 0; transform: scale(0.98); }
