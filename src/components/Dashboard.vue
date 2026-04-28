@@ -104,6 +104,8 @@ import RunnerDetailModal from './RunnerDetailModal.vue';
 import { ref, computed } from 'vue';
 import { store } from '../dataStore';
 
+console.log('DASHBOARD_INIT_STABILITY_V3');
+
 const props = defineProps({
   currentUser: Object
 });
