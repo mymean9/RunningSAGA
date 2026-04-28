@@ -19,7 +19,7 @@
                </div>
             </div>
             <div class="mt-6 md:mt-0 text-right">
-               <p class="text-4xl font-black italic text-white">{{ totalDistance.toFixed(3) }} <span class="text-lg text-white/30">KM</span></p>
+               <p class="text-4xl font-black italic text-white">{{ totalDistance.toFixed(1) }} <span class="text-lg text-white/30">KM</span></p>
                <p class="text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase">CURRENT TOTAL</p>
             </div>
          </div>
@@ -38,8 +38,8 @@
          </div>
 
          <div class="flex justify-between items-center relative z-10">
-            <p class="text-xl font-black italic text-volt">{{ goalProgress.toFixed(3) }}% COMPLETED</p>
-            <p class="text-[10px] font-bold tracking-[0.2em] text-white/30 uppercase italic">REMAINING: {{ (GRAND_GOAL - totalDistance).toFixed(3) }} KM</p>
+            <p class="text-xl font-black italic text-volt">{{ goalProgress.toFixed(1) }}% COMPLETED</p>
+            <p class="text-[10px] font-bold tracking-[0.2em] text-white/30 uppercase italic">REMAINING: {{ (GRAND_GOAL - totalDistance).toFixed(1) }} KM</p>
          </div>
 
          <!-- Back decor -->
@@ -95,7 +95,7 @@
       <div class="mt-8 bg-[#0a0a0a] border border-white/5 p-6 rounded-sm">
          <div class="flex justify-between items-center mb-6">
             <h3 class="text-xs font-black italic uppercase tracking-[0.4em] text-white">TRIBE ACTIVITY (LAST 7 DAYS)</h3>
-            <span class="text-[10px] font-bold text-volt uppercase tracking-widest">{{ weeklyTotal.toFixed(3) }} KM TOTAL</span>
+            <span class="text-[10px] font-bold text-volt uppercase tracking-widest">{{ weeklyTotal.toFixed(1) }} KM TOTAL</span>
          </div>
          
          <!-- SVG CHART -->
@@ -165,7 +165,7 @@
             <div v-for="runner in sortedByDist" :key="runner.name" class="relative">
                <div class="flex justify-between items-center mb-1">
                   <span class="text-[10px] font-black italic text-white/60 uppercase tracking-widest">{{ runner.name }}</span>
-                  <span class="text-[10px] font-black italic text-volt">{{ ((runner.distance / (totalDistance || 1)) * 100).toFixed(3) }}%</span>
+                  <span class="text-[10px] font-black italic text-volt">{{ ((runner.distance / (totalDistance || 1)) * 100).toFixed(1) }}%</span>
                </div>
                <div class="h-1 bg-[#222222] overflow-hidden">
                   <div class="h-full bg-volt opacity-50 transition-all duration-1000" :style="{ width: `${(runner.distance / (totalDistance || 1)) * 100}%` }"></div>

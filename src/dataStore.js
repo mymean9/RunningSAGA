@@ -194,7 +194,7 @@ export const store = reactive({
         route: JSON.stringify(data.route || [])
       };
 
-      const updatedDistance = Number((Number(runner.distance || 0) + Number(data.distance || 0)).toFixed(3));
+      const updatedDistance = Number(((runner.distance || 0) + (data.distance || 0)).toFixed(1));
       const updatedRunner = {
         ...runner,
         activities: [newActivity, ...(runner.activities || [])],
