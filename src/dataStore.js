@@ -270,12 +270,18 @@ onSnapshot(runnersCol, (snapshot) => {
   } else {
     store.runners = snapshot.docs.map(doc => doc.data());
   }
+}, (error) => {
+  alert('FIRESTORE RUNNERS ERROR: ' + error.message);
+  console.error(error);
 });
 
 onSnapshot(groupsCol, (snapshot) => {
   if (!snapshot.empty) {
     store.groups = snapshot.docs.map(doc => doc.data());
   }
+}, (error) => {
+  alert('FIRESTORE GROUPS ERROR: ' + error.message);
+  console.error(error);
 });
 
 // Retain active user locally across reloads
