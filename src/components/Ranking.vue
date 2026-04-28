@@ -16,7 +16,7 @@
           <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#222222] border border-white/20 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center font-black italic text-lg md:text-xl">2</div>
           <div class="text-center mt-2">
              <h3 class="text-xl md:text-2xl font-black italic uppercase tracking-tighter text-white mb-1 truncate max-w-[150px] md:max-w-none">{{ allRunners[1].name }}</h3>
-             <p class="text-volt font-black italic text-base md:text-lg">{{ Number(allRunners[1].distance || 0).toFixed(1) }} <span class="text-[10px] text-white/40 tracking-widest uppercase">KM</span></p>
+             <p class="text-volt font-black italic text-base md:text-lg">{{ Number(allRunners[1].distance || 0).toFixed(3) }} <span class="text-[10px] text-white/40 tracking-widest uppercase">KM</span></p>
           </div>
           <div class="mt-3 px-3 py-1 bg-white/5 rounded-full flex items-center space-x-2">
              <span class="text-[9px] md:text-[10px] font-bold text-white/40 tracking-widest uppercase italic">Pace: {{ allRunners[1].pace }}</span>
@@ -31,7 +31,7 @@
                 <span class="px-2 py-0.5 bg-volt text-black text-[8px] font-black italic uppercase tracking-widest rounded-sm">TOP PERFORMER</span>
              </div>
              <h3 class="text-3xl md:text-4xl font-black italic uppercase tracking-tighter text-white mb-2 truncate max-w-[180px] md:max-w-none">{{ allRunners[0].name }}</h3>
-             <p class="text-volt font-black italic text-2xl md:text-3xl">{{ Number(allRunners[0].distance || 0).toFixed(1) }} <span class="text-[12px] text-white/40 tracking-widest uppercase">KM</span></p>
+             <p class="text-volt font-black italic text-2xl md:text-3xl">{{ Number(allRunners[0].distance || 0).toFixed(3) }} <span class="text-[12px] text-white/40 tracking-widest uppercase">KM</span></p>
           </div>
           <div class="mt-4 md:mt-6 px-4 py-1 bg-volt/10 rounded-full flex items-center space-x-2">
              <span class="text-[10px] md:text-[11px] font-bold text-volt tracking-widest uppercase italic">Pace: {{ allRunners[0].pace }}</span>
@@ -43,7 +43,7 @@
           <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#222222] border border-white/20 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center font-black italic text-lg md:text-xl">3</div>
           <div class="text-center mt-2">
              <h3 class="text-xl md:text-2xl font-black italic uppercase tracking-tighter text-white mb-1 truncate max-w-[150px] md:max-w-none">{{ allRunners[2].name }}</h3>
-             <p class="text-volt font-black italic text-base md:text-lg">{{ Number(allRunners[2].distance || 0).toFixed(1) }} <span class="text-[10px] text-white/40 tracking-widest uppercase">KM</span></p>
+             <p class="text-volt font-black italic text-base md:text-lg">{{ Number(allRunners[2].distance || 0).toFixed(3) }} <span class="text-[10px] text-white/40 tracking-widest uppercase">KM</span></p>
           </div>
           <div class="mt-3 px-3 py-1 bg-white/5 rounded-full flex items-center space-x-2">
              <span class="text-[9px] md:text-[10px] font-bold text-white/40 tracking-widest uppercase italic">Pace: {{ allRunners[2].pace }}</span>
@@ -84,7 +84,7 @@
                </div>
             </div>
             <div class="text-right">
-              <p class="text-xl md:text-3xl font-black italic text-volt leading-none">{{ Number(runner.distance || 0).toFixed(1) }} <span class="text-[8px] md:text-[10px] text-white/40 ml-1">KM</span></p>
+              <p class="text-xl md:text-3xl font-black italic text-volt leading-none">{{ Number(runner.distance || 0).toFixed(3) }} <span class="text-[8px] md:text-[10px] text-white/40 ml-1">KM</span></p>
             </div>
           </div>
 

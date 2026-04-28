@@ -20,11 +20,11 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-[#111] border border-white/5 p-4 rounded-sm group hover:border-volt/30 transition-all">
                <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">YOUR DISTANCE</p>
-               <p class="text-2xl font-black italic text-white leading-none">{{ (currentUser?.distance || 0).toFixed(1) }} <span class="text-[10px] text-volt">KM</span></p>
+               <p class="text-2xl font-black italic text-white leading-none">{{ (currentUser?.distance || 0).toFixed(3) }} <span class="text-[10px] text-volt">KM</span></p>
             </div>
             <div class="bg-[#111] border border-white/5 p-4 rounded-sm group hover:border-volt/30 transition-all">
                <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">TRIBE TOTAL</p>
-               <p class="text-2xl font-black italic text-white leading-none">{{ (totalDistance || 0).toFixed(1) }} <span class="text-[10px] text-volt">KM</span></p>
+               <p class="text-2xl font-black italic text-white leading-none">{{ (totalDistance || 0).toFixed(3) }} <span class="text-[10px] text-volt">KM</span></p>
             </div>
         </div>
       </div>

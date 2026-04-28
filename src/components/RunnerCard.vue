@@ -40,7 +40,7 @@
       <div class="text-right">
         <h3 class="text-[10px] uppercase font-bold tracking-[0.3em] text-white/40 mb-1 text-right text-nrc">DISTANCE</h3>
         <p class="text-4xl font-black italic tracking-tight text-white leading-none">
-          <span class="text-volt">{{ (distance || 0).toFixed(1) }}</span>
+          <span class="text-volt">{{ (distance || 0).toFixed(3) }}</span>
           <span class="text-[14px] ml-1 uppercase text-white/60 tracking-wider font-bold">KM</span>
         </p>
       </div>

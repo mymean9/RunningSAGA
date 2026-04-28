@@ -80,15 +80,15 @@
         
         <!-- Activity Route Map -->
         <div v-else class="flex-1 flex flex-col p-6 md:p-10 overflow-hidden">
-           <button @click="backToList" class="self-start mb-4 md:mb-6 text-white/50 hover:text-white font-bold tracking-widest text-xs uppercase flex items-center transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-              BACK TO LOGS
+           <button @click="backToList" class="self-start mb-6 px-4 py-2 bg-volt/10 border border-volt/30 text-volt hover:bg-volt hover:text-black font-black italic tracking-[0.2em] text-[10px] uppercase flex items-center transition-all group">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-2 transform group-hover:-translate-x-1 transition-transform"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              BACK TO LOG LIST
            </button>
            
            <div class="flex justify-between items-end mb-6">
               <div>
                  <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">{{ selectedActivity.date }}</p>
-                 <p class="text-4xl font-black italic text-white tracking-tighter">{{ Number(selectedActivity.distance || 0).toFixed(1) }} <span class="text-lg text-volt font-bold uppercase">KM</span></p>
+                 <p class="text-4xl font-black italic text-white tracking-tighter">{{ Number(selectedActivity.distance || 0).toFixed(3) }} <span class="text-lg text-volt font-bold uppercase">KM</span></p>
               </div>
               <div class="text-right">
                  <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">PACE</p>
