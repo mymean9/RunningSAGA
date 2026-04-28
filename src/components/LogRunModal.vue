@@ -71,7 +71,7 @@
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase mb-2">DISTANCE (KM)</label>
-              <input v-model.number="form.distance" type="number" step="0.1" required class="w-full bg-[#222222] border border-[#333333] text-white p-4 text-2xl font-black italic outline-none focus:border-volt transition-colors" placeholder="0.0">
+              <input v-model.number="form.distance" type="number" step="0.001" required class="w-full bg-[#222222] border border-[#333333] text-white p-4 text-2xl font-black italic outline-none focus:border-volt transition-colors" placeholder="0.000">
             </div>
             <div>
               <label class="block text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase mb-2">AVG PACE (/KM)</label>

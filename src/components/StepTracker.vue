@@ -28,7 +28,7 @@
        <div class="p-6 bg-zinc-900 border-t border-white/10 grid grid-cols-2 gap-8 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] z-10 relative">
           <div class="text-center">
              <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1 font-sans">DISTANCE</p>
-             <p class="text-3xl font-black italic text-white">{{ distance.toFixed(2) }} <span class="text-xs text-white/40">KM</span></p>
+             <p class="text-3xl font-black italic text-white">{{ distance.toFixed(3) }} <span class="text-xs text-white/40">KM</span></p>
           </div>
           <div class="text-center">
              <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1 font-sans">STEPS</p>
@@ -69,7 +69,7 @@
           </svg>
           <div class="text-center z-20 flex flex-col items-center justify-center">
              <span class="text-volt font-bold text-[10px] uppercase tracking-[0.4em] mb-1">{{ steps.toLocaleString() }} STEPS</span>
-             <span class="block text-[85px] md:text-[110px] font-black italic tracking-tighter leading-none text-white animate-pulse-light">{{ distance.toFixed(2) }}</span>
+             <span class="block text-[85px] md:text-[110px] font-black italic tracking-tighter leading-none text-white animate-pulse-light">{{ distance.toFixed(3) }}</span>
              <span class="block text-volt font-black italic tracking-widest uppercase text-base mt-1">KM TRACKED</span>
           </div>
        </div>
