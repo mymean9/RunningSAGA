@@ -88,19 +88,19 @@
     />
 
     <!-- RUNNER DETAIL MODAL -->
-    <RunnerDetailModal
+    <!-- <RunnerDetailModal
       v-if="selectedRunner"
       :is-open="isDetailOpen"
       :runner="selectedRunner"
       @close="isDetailOpen = false"
-    />
+    /> -->
   </div>
 </template>
 
 <script setup>
 import RunnerCard from './RunnerCard.vue';
 import LogRunModal from './LogRunModal.vue';
-import RunnerDetailModal from './RunnerDetailModal.vue';
+// import RunnerDetailModal from './RunnerDetailModal.vue';
 import { ref, computed } from 'vue';
 import { store } from '../dataStore';
 
