@@ -97,7 +97,7 @@
            </div>
            
            <div class="w-full flex-1 min-h-[250px] md:min-h-[400px] border border-white/10 relative overflow-hidden bg-[#111111] group">
-              <div v-if="selectedActivity.route && selectedActivity.route.length > 0" class="absolute inset-0 z-0 isolate">
+              <div v-if="selectedActivity.route && selectedActivity.route.length > 0" class="absolute inset-0 z-0">
                  <div ref="mapContainer" class="w-full h-full"></div>
                  
                  <!-- Map Controls Overlay -->
@@ -234,7 +234,7 @@ const selectActivity = async (act) => {
           mapInstance.invalidateSize();
           if (polylineInstance) mapInstance.fitBounds(polylineInstance.getBounds(), { padding: [40, 40] });
         }
-      }, 200);
+      }, 500);
     } catch (err) {
       console.error("Map initialization error:", err);
     }
@@ -304,9 +304,9 @@ onUnmounted(() => {
   z-index: 1;
 }
 
-:deep(.leaflet-tile-pane) {
+/* :deep(.leaflet-tile-pane) {
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-}
+} */
 
 @keyframes fade-in {
   from { opacity: 0; transform: scale(0.98); }
