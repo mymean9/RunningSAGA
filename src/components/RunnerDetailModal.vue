@@ -23,7 +23,7 @@
               <div class="flex items-center space-x-8">
                 <div>
                   <p class="text-[10px] font-bold tracking-[0.3em] text-white/40 uppercase">TOTAL DISTANCE</p>
-                  <p class="text-3xl font-black italic text-volt">{{ Number(runner.distance).toFixed(3) }} <span class="text-sm">KM</span></p>
+                  <p class="text-3xl font-black italic text-volt">{{ Number(runner.distance || 0).toFixed(3) }} <span class="text-sm">KM</span></p>
                 </div>
                 <div>
                   <p class="text-[10px] font-bold tracking-[0.3em] text-white/40 uppercase">SESSIONS</p>
@@ -65,7 +65,7 @@
                   
                   <div>
                     <p class="text-xs font-bold text-white/40 uppercase tracking-widest">{{ act.date }}</p>
-                    <p class="text-3xl font-black italic text-white tracking-tighter">{{ Number(act.distance).toFixed(3) }} <span class="text-sm text-volt font-bold uppercase tracking-wider">KM</span></p>
+                    <p class="text-3xl font-black italic text-white tracking-tighter">{{ Number(act.distance || 0).toFixed(3) }} <span class="text-sm text-volt font-bold uppercase tracking-wider">KM</span></p>
                   </div>
                 </div>
                 
@@ -97,7 +97,7 @@
            <div class="flex justify-between items-end mb-6">
               <div>
                  <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">{{ selectedActivity.date }}</p>
-                 <p class="text-4xl font-black italic text-white tracking-tighter">{{ Number(selectedActivity.distance).toFixed(3) }} <span class="text-lg text-volt font-bold uppercase">KM</span></p>
+                 <p class="text-4xl font-black italic text-white tracking-tighter">{{ Number(selectedActivity.distance || 0).toFixed(3) }} <span class="text-lg text-volt font-bold uppercase">KM</span></p>
               </div>
               <div class="text-right">
                  <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">PACE</p>
@@ -158,7 +158,7 @@
            <div class="p-8 bg-[#0a0a0a] border-t border-white/10 grid grid-cols-2 gap-8 z-[200]">
               <div>
                  <p class="text-[10px] text-white/40 font-bold uppercase tracking-[0.3em] mb-1">ROUTE DISTANCE</p>
-                 <p class="text-4xl font-black italic text-white">{{ Number(selectedActivity.distance).toFixed(3) }} <span class="text-sm text-volt">KM</span></p>
+                 <p class="text-4xl font-black italic text-white">{{ Number(selectedActivity.distance || 0).toFixed(3) }} <span class="text-sm text-volt">KM</span></p>
               </div>
               <div class="text-right">
                  <p class="text-[10px] text-white/40 font-bold uppercase tracking-[0.3em] mb-1">AVG PACE</p>
@@ -190,6 +190,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['close']);
 
+const selectedActivity = ref(null);
 const isMapFullscreen = ref(false);
 const mapContainer = ref(null);
 const fullscreenMapContainer = ref(null);
@@ -239,7 +240,7 @@ const toggleMapFullscreen = async () => {
     if (isMapFullscreen.value) {
       isMapFullscreen.value = false;
       await nextTick();
-      const smallContainer = document.querySelector('[ref="mapContainer"]').parentElement;
+      const smallContainer = mapContainer.value.parentElement;
       if (smallContainer && mapContainer.value) {
         smallContainer.prepend(mapContainer.value);
       }
