@@ -44,6 +44,7 @@ const defaultGroups = [
 ];
 
 const savedUser = JSON.parse(localStorage.getItem('saga_user') || 'null');
+const savedLocale = localStorage.getItem('saga_locale') || 'ko';
 
 export const store = reactive({
   runners: [],
@@ -51,6 +52,61 @@ export const store = reactive({
   user: savedUser,
   loading: false,
   isTrackingActive: false,
+  locale: savedLocale,
+
+  // Translation Dictionary
+  translations: {
+    ko: {
+      your_distance: '나의 누적 거리',
+      tribe_total: '크루 전체 거리',
+      my_saga_crew: '나의 사가 크루',
+      invite_code: '초대 코드',
+      leave_crew: '크루 탈퇴',
+      running_solo: '솔로 러닝 중',
+      solo_desc: '현재 소속된 크루가 없습니다. 대시보드에는 본인의 기록만 표시됩니다. 크루를 생성하거나 참가하여 다른 러너들과 경쟁해보세요.',
+      create_crew: '크루 생성',
+      join_crew: '크루 참가',
+      no_runners: '아직 참가한 러너가 없습니다. 첫 번째가 되어보세요!',
+      build_v: '러닝 사가 빌드',
+      final_update: '최종 안정화 업데이트',
+      enter_crew_name: '새로운 크루 이름을 입력하세요:',
+      enter_crew_code: '6자리 크루 초대 코드를 입력하세요:',
+      invalid_code: '유효하지 않은 코드입니다. 다시 확인해주세요.',
+      joined_success: '크루에 성공적으로 참가했습니다!',
+      leave_confirm: '정말 크루를 탈퇴하시겠습니까? 리더보드 접근 권한을 잃게 됩니다.',
+      km: 'KM'
+    },
+    en: {
+      your_distance: 'YOUR DISTANCE',
+      tribe_total: 'TRIBE TOTAL',
+      my_saga_crew: 'MY SAGA CREW',
+      invite_code: 'INVITE CODE',
+      leave_crew: 'LEAVE CREW',
+      running_solo: 'RUNNING SOLO',
+      solo_desc: 'YOU ARE CURRENTLY NOT IN A CREW. YOUR DASHBOARD ONLY SHOWS YOUR OWN STATS. CREATE OR JOIN A CREW TO COMPETE WITH OTHERS.',
+      create_crew: 'CREATE CREW',
+      join_crew: 'JOIN CREW',
+      no_runners: 'NO RUNNERS JOINED YET. BE THE FIRST!',
+      build_v: 'Running.SAGA Build',
+      final_update: 'Final Stable Update',
+      enter_crew_name: 'ENTER NEW CREW NAME:',
+      enter_crew_code: 'ENTER 6-CHARACTER CREW INVITE CODE:',
+      invalid_code: 'INVALID CREW CODE. PLEASE CHECK AND TRY AGAIN.',
+      joined_success: 'SUCCESSFULLY JOINED THE CREW!',
+      leave_confirm: 'ARE YOU SURE YOU WANT TO LEAVE THIS CREW? YOU WILL LOSE ACCESS TO THE CREW LEADERBOARD.',
+      km: 'KM'
+    }
+  },
+
+  // Translation Helper
+  t(key) {
+    return this.translations[this.locale][key] || key;
+  },
+
+  setLocale(lang) {
+    this.locale = lang;
+    localStorage.setItem('saga_locale', lang);
+  },
 
   async signup(email, password, displayName) {
     this.loading = true;

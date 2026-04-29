@@ -19,12 +19,12 @@
         <!-- STAT CARDS -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-[#111] border border-white/5 p-4 rounded-sm group hover:border-volt/30 transition-all">
-               <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">YOUR DISTANCE</p>
-               <p class="text-2xl font-black italic text-white leading-none">{{ (currentUser?.distance || 0).toFixed(3) }} <span class="text-[10px] text-volt">KM</span></p>
+               <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">{{ store.t('your_distance') }}</p>
+               <p class="text-2xl font-black italic text-white leading-none">{{ (currentUser?.distance || 0).toFixed(3) }} <span class="text-[10px] text-volt">{{ store.t('km') }}</span></p>
             </div>
             <div class="bg-[#111] border border-white/5 p-4 rounded-sm group hover:border-volt/30 transition-all">
-               <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">TRIBE TOTAL</p>
-               <p class="text-2xl font-black italic text-white leading-none">{{ (totalDistance || 0).toFixed(3) }} <span class="text-[10px] text-volt">KM</span></p>
+               <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">{{ store.t('tribe_total') }}</p>
+               <p class="text-2xl font-black italic text-white leading-none">{{ (totalDistance || 0).toFixed(3) }} <span class="text-[10px] text-volt">{{ store.t('km') }}</span></p>
             </div>
         </div>
       </div>
@@ -32,25 +32,25 @@
       <!-- CREW MANAGEMENT AREA (ONLY LOGGED IN) -->
       <div v-if="currentUser" class="mb-12">
         <div v-if="myGroup" class="bg-white/5 border border-volt/30 p-6 rounded-sm inline-block w-full md:w-auto">
-           <p class="text-xs font-bold text-volt uppercase tracking-widest mb-1">MY SAGA CREW</p>
+           <p class="text-xs font-bold text-volt uppercase tracking-widest mb-1">{{ store.t('my_saga_crew') }}</p>
            <h3 class="text-3xl md:text-5xl font-black italic text-white uppercase tracking-tighter">{{ myGroup.name }}</h3>
            
            <div class="mt-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
              <div class="bg-black border border-white/20 px-4 py-2 flex items-center justify-between flex-1">
-               <span class="text-[10px] font-bold text-white/40 tracking-widest uppercase mr-4">INVITE CODE</span>
+               <span class="text-[10px] font-bold text-white/40 tracking-widest uppercase mr-4">{{ store.t('invite_code') }}</span>
                <span class="text-xl font-black italic tracking-widest select-all">{{ myGroup.secretCode }}</span>
              </div>
-             <button @click="leaveGroup" class="text-xs text-red-500 hover:text-red-400 font-bold uppercase tracking-widest underline md:ml-4 text-center">LEAVE CREW</button>
+             <button @click="leaveGroup" class="text-xs text-red-500 hover:text-red-400 font-bold uppercase tracking-widest underline md:ml-4 text-center">{{ store.t('leave_crew') }}</button>
            </div>
         </div>
         
         <div v-else class="bg-[#111111] border border-[#222222] p-8 rounded-sm">
            <div class="max-w-xl">
-             <h3 class="text-2xl font-black italic uppercase tracking-tighter mb-2">RUNNING SOLO</h3>
-             <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-6">YOU ARE CURRENTLY NOT IN A CREW. YOUR DASHBOARD ONLY SHOWS YOUR OWN STATS. CREATE OR JOIN A CREW TO COMPETE WITH OTHERS.</p>
+             <h3 class="text-2xl font-black italic uppercase tracking-tighter mb-2">{{ store.t('running_solo') }}</h3>
+             <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-6">{{ store.t('solo_desc') }}</p>
              <div class="flex flex-col sm:flex-row gap-4">
-                <button @click="createGroup" class="flex-1 px-6 py-3 bg-volt text-black font-black italic text-lg uppercase tracking-tighter hover:bg-white transition-all text-center">CREATE CREW</button>
-                <button @click="joinGroup" class="flex-1 px-6 py-3 border border-white/20 text-white font-black italic text-lg uppercase tracking-tighter hover:border-white transition-all text-center">JOIN CREW</button>
+                <button @click="createGroup" class="flex-1 px-6 py-3 bg-volt text-black font-black italic text-lg uppercase tracking-tighter hover:bg-white transition-all text-center">{{ store.t('create_crew') }}</button>
+                <button @click="joinGroup" class="flex-1 px-6 py-3 border border-white/20 text-white font-black italic text-lg uppercase tracking-tighter hover:border-white transition-all text-center">{{ store.t('join_crew') }}</button>
              </div>
            </div>
         </div>
@@ -69,13 +69,13 @@
       </div>
       
       <div v-if="runners.length === 0" class="text-center py-20">
-         <p class="text-2xl font-black italic text-white/20 uppercase tracking-tighter">NO RUNNERS JOINED YET. BE THE FIRST!</p>
+         <p class="text-2xl font-black italic text-white/20 uppercase tracking-tighter">{{ store.t('no_runners') }}</p>
       </div>
 
       <!-- BUILD VERSION INDICATOR -->
       <div class="mt-16 text-center">
-         <p class="text-[10px] font-bold text-white/20 tracking-[0.3em] uppercase">Running.SAGA Build v1.0.2</p>
-         <p class="text-[8px] text-white/10 mt-1">2026-04-20 Update</p>
+         <p class="text-[10px] font-bold text-white/20 tracking-[0.3em] uppercase">{{ store.t('build_v') }} v1.0.3</p>
+         <p class="text-[8px] text-white/10 mt-1">{{ store.t('final_update') }}</p>
       </div>
     </div>
 
@@ -156,26 +156,26 @@ const totalDistance = computed(() => {
 });
 
 const createGroup = () => {
-  const name = prompt("ENTER NEW CREW NAME:");
+  const name = prompt(store.t('enter_crew_name'));
   if (name && name.trim()) {
     store.createGroup(name.trim());
   }
 };
 
 const joinGroup = () => {
-  const code = prompt("ENTER 6-CHARACTER CREW INVITE CODE:");
+  const code = prompt(store.t('enter_crew_code'));
   if (code && code.trim()) {
     const success = store.joinGroup(code.trim());
     if (!success) {
-      alert("INVALID CREW CODE. PLEASE CHECK AND TRY AGAIN.");
+      alert(store.t('invalid_code'));
     } else {
-      alert("SUCCESSFULLY JOINED THE CREW!");
+      alert(store.t('joined_success'));
     }
   }
 };
 
 const leaveGroup = () => {
-  if(confirm("ARE YOU SURE YOU WANT TO LEAVE THIS CREW? YOU WILL LOSE ACCESS TO THE CREW LEADERBOARD.")) {
+  if(confirm(store.t('leave_confirm'))) {
     store.leaveGroup();
   }
 };

@@ -63,10 +63,10 @@ const handleLogout = () => {
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap');
 
 .main-app {
-  font-family: 'Outfit', 'Inter', sans-serif;
+  font-family: 'Black Han Sans', 'Outfit', 'Inter', sans-serif;
   background-color: #000000;
   color: white;
   min-height: 100vh;

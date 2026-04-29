@@ -27,6 +27,14 @@
 
       <!-- PROFILE ACCESS -->
       <div class="flex items-center space-x-4">
+        <!-- LANGUAGE SWITCHER -->
+        <button 
+          @click="store.setLocale(store.locale === 'ko' ? 'en' : 'ko')"
+          class="px-2 py-1 border border-white/20 text-[10px] font-black italic hover:bg-white hover:text-black transition-all uppercase tracking-tighter text-white"
+        >
+          {{ store.locale === 'ko' ? 'EN' : 'KR' }}
+        </button>
+
         <button v-if="user" @click="isProfileOpen = !isProfileOpen" class="w-8 h-8 rounded-full bg-[#111] border border-volt/30 flex items-center justify-center text-volt hover:bg-volt hover:text-black transition-all">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </button>
