@@ -5,23 +5,34 @@
         <!-- Decor line -->
         <div class="absolute top-0 left-0 w-full h-1 bg-volt"></div>
         
-        <div class="flex justify-between items-start mb-12 mt-6 md:mt-0">
-          <div>
-            <h2 class="text-6xl md:text-4xl font-black italic tracking-tighter text-white uppercase leading-[0.8]">
-              LOG NEW<br/><span class="text-volt">ACTIVITY</span>
-            </h2>
-            <p class="text-[11px] font-bold tracking-[0.4em] text-white/40 uppercase mt-4">Enter your run details</p>
-          </div>
-          <button @click="$emit('close')" class="text-white/40 hover:text-white transition-colors p-2 -mr-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <div class="flex justify-between items-center mb-8">
+          <h2 class="text-3xl font-black italic uppercase tracking-tighter text-white">{{ store.t('log_activity') }}</h2>
+          <button @click="$emit('close')" class="text-white/40 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
 
         <form @submit.prevent="handleSubmit" class="space-y-6">
-          <!-- DATE INPUT -->
-          <div>
-            <label class="block text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase mb-2">DATE</label>
-            <input v-model="form.date" type="date" required class="w-full bg-[#222222] border border-[#333333] text-white p-4 font-black italic outline-none focus:border-volt transition-colors">
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-white/30 uppercase tracking-widest block">{{ store.t('distance') }} (KM)</label>
+            <input 
+              v-model="form.distance" 
+              type="number" 
+              step="0.01" 
+              required
+              class="w-full bg-[#111] border border-white/10 p-4 text-white font-bold focus:border-volt outline-none transition-all"
+              placeholder="0.00"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-white/30 uppercase tracking-widest block">{{ store.t('date') }}</label>
+            <input 
+              v-model="form.date" 
+              type="date" 
+              required
+              class="w-full bg-[#111] border border-white/10 p-4 text-white font-bold focus:border-volt outline-none transition-all"
+            />
           </div>
 
           <!-- IMAGE UPLOAD AREA -->

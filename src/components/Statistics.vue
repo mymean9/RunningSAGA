@@ -3,24 +3,26 @@
     <div class="max-w-7xl mx-auto px-6 pt-12">
       <!-- Header -->
       <div class="mb-12 border-l-4 border-volt pl-6">
-        <h1 class="text-6xl font-black italic tracking-tighter uppercase leading-none text-white">
-          TRIBE <span class="text-volt">INSIGHTS</span>
+        <h1 class="text-4xl md:text-6xl font-black italic tracking-tighter uppercase leading-none text-white">
+          {{ store.t('statistics') }} <span class="text-volt">{{ store.t('insights') }}</span>
         </h1>
-        <p class="text-[11px] font-bold tracking-[0.4em] text-white/40 uppercase mt-4">Collective performance & milestone tracking</p>
+        <p class="text-[10px] md:text-[11px] font-bold tracking-[0.3em] md:tracking-[0.4em] text-white/40 uppercase mt-4">
+          {{ store.t('collective_performance') }}
+        </p>
       </div>
 
       <!-- Grand Goal Progress Section -->
       <div class="bg-[#111111] border border-white/10 p-10 mb-12 relative overflow-hidden group">
          <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 relative z-10">
             <div>
-               <h2 class="text-[10px] font-bold tracking-[0.5em] text-volt uppercase mb-2">MONTHLY MILESTONE</h2>
+               <h2 class="text-[10px] font-bold tracking-[0.5em] text-volt uppercase mb-2">{{ store.t('monthly_milestone') }}</h2>
                <div class="text-6xl md:text-8xl font-black italic tracking-tighter text-white leading-none uppercase">
-                  ROAD TO <span class="text-volt">{{ GRAND_GOAL }}</span> KM
+                  {{ store.t('road_to') }} <span class="text-volt">{{ GRAND_GOAL }}</span> KM
                </div>
             </div>
             <div class="mt-6 md:mt-0 text-right">
                <p class="text-4xl font-black italic text-white">{{ totalDistance.toFixed(3) }} <span class="text-lg text-white/30">KM</span></p>
-               <p class="text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase">CURRENT TOTAL</p>
+               <p class="text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase">{{ store.t('current_total') }}</p>
             </div>
          </div>
 
@@ -38,8 +40,8 @@
          </div>
 
          <div class="flex justify-between items-center relative z-10">
-            <p class="text-xl font-black italic text-volt">{{ goalProgress.toFixed(3) }}% COMPLETED</p>
-            <p class="text-[10px] font-bold tracking-[0.2em] text-white/30 uppercase italic">REMAINING: {{ (GRAND_GOAL - totalDistance).toFixed(3) }} KM</p>
+            <p class="text-xl font-black italic text-volt">{{ goalProgress.toFixed(3) }}% {{ store.t('completed') }}</p>
+            <p class="text-[10px] font-bold tracking-[0.2em] text-white/30 uppercase italic">{{ store.t('remaining') }}: {{ (GRAND_GOAL - totalDistance).toFixed(3) }} KM</p>
          </div>
 
          <!-- Back decor -->
@@ -52,17 +54,17 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
          <!-- Total Sessions -->
          <div class="bg-[#111111] border border-white/5 p-8 group hover:border-volt/30 transition-all">
-            <p class="text-[10px] font-bold tracking-[0.3em] text-white/40 uppercase mb-4">TOTAL SESSIONS</p>
+            <p class="text-[10px] font-bold tracking-[0.3em] text-white/40 uppercase mb-4">{{ store.t('total_sessions') }}</p>
             <div class="flex items-baseline space-x-2">
                <span class="text-5xl font-black italic text-white">{{ totalRuns }}</span>
-               <span class="text-[10px] font-bold text-volt uppercase tracking-widest leading-none">RUNS</span>
+               <span class="text-[10px] font-bold text-volt uppercase tracking-widest leading-none">{{ store.t('runs') }}</span>
             </div>
             <div class="h-1 w-12 bg-volt/30 mt-6 group-hover:w-full transition-all duration-500"></div>
          </div>
 
          <!-- Avg Pace -->
          <div class="bg-[#111111] border border-white/5 p-8 group hover:border-volt/30 transition-all">
-            <p class="text-[10px] font-bold tracking-[0.3em] text-white/40 uppercase mb-4">AVG TRIBE PACE</p>
+            <p class="text-[10px] font-bold tracking-[0.3em] text-white/40 uppercase mb-4">{{ store.t('avg_pace') }}</p>
             <div class="flex items-baseline space-x-2">
                <span class="text-5xl font-black italic text-white">{{ averagePace }}</span>
                <span class="text-[10px] font-bold text-volt uppercase tracking-widest leading-none">/KM</span>
@@ -72,30 +74,30 @@
 
          <!-- Active Runners -->
          <div class="bg-[#111111] border border-white/5 p-8 group hover:border-volt/30 transition-all">
-            <p class="text-[10px] font-bold tracking-[0.3em] text-white/40 uppercase mb-4">ACTIVE RUNNERS</p>
+            <p class="text-[10px] font-bold tracking-[0.3em] text-white/40 uppercase mb-4">{{ store.t('active_runners') }}</p>
             <div class="flex items-baseline space-x-2">
                <span class="text-5xl font-black italic text-white">{{ store.runners.length }}</span>
-               <span class="text-[10px] font-bold text-volt uppercase tracking-widest leading-none">ATHLETES</span>
+               <span class="text-[10px] font-bold text-volt uppercase tracking-widest leading-none">{{ store.t('athletes') }}</span>
             </div>
             <div class="h-1 w-12 bg-volt/30 mt-6 group-hover:w-full transition-all duration-500"></div>
          </div>
 
          <!-- Goal Achievement -->
          <div class="bg-volt p-8 group transition-all">
-            <p class="text-[10px] font-black tracking-[0.3em] text-black/50 uppercase mb-4">STILL TO GO</p>
+            <p class="text-[10px] font-black tracking-[0.3em] text-black/50 uppercase mb-4">{{ store.t('still_to_go') }}</p>
             <div class="flex items-baseline space-x-2">
                <span class="text-5xl font-black italic text-black">{{ runnersReachedGoal }}</span>
-               <span class="text-[10px] font-bold text-black/40 uppercase tracking-widest leading-none">AT FINISH LINE</span>
+               <span class="text-[10px] font-bold text-black/40 uppercase tracking-widest leading-none">{{ store.t('at_finish_line') }}</span>
             </div>
-            <p class="text-[9px] font-black italic text-black/60 mt-4 uppercase">TARGET: {{ store.runners.length }} RUNNERS @ 200KM</p>
+            <p class="text-[9px] font-black italic text-black/60 mt-4 uppercase">{{ store.t('target') }}: {{ store.runners.length }} {{ store.t('runners') }} @ 200KM</p>
          </div>
       </div>
 
       <!-- Tribe Participation Chart Simulation -->
       <div class="mt-8 bg-[#0a0a0a] border border-white/5 p-6 rounded-sm">
          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xs font-black italic uppercase tracking-[0.4em] text-white">TRIBE ACTIVITY (LAST 7 DAYS)</h3>
-            <span class="text-[10px] font-bold text-volt uppercase tracking-widest">{{ weeklyTotal.toFixed(3) }} KM TOTAL</span>
+            <h3 class="text-xs font-black italic uppercase tracking-[0.4em] text-white">{{ store.t('weekly_activity') }}</h3>
+            <span class="text-[10px] font-bold text-volt uppercase tracking-widest">{{ weeklyTotal.toFixed(3) }} KM {{ store.t('total') }}</span>
          </div>
          
          <!-- SVG CHART -->
@@ -158,8 +160,8 @@
       <!-- Individual Distribution -->
       <div class="mt-8 bg-[#0a0a0a] border border-white/5 p-6 rounded-sm">
          <div class="flex justify-between items-center mb-8">
-            <h3 class="text-xs font-black italic uppercase tracking-[0.4em] text-white">INDIVIDUAL STAKES</h3>
-            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest">BY DISTANCE %</span>
+            <h3 class="text-xs font-black italic uppercase tracking-[0.4em] text-white">{{ store.t('individual_stakes') }}</h3>
+            <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest">{{ store.t('by_distance') }} %</span>
          </div>
          <div class="space-y-6">
             <div v-for="runner in sortedByDist" :key="runner.name" class="relative">

@@ -62,7 +62,7 @@
                 
                 <div class="flex items-center space-x-8 text-right">
                   <div class="hidden sm:block">
-                    <p class="text-[10px] font-bold text-white/20 uppercase tracking-widest">PACE</p>
+                    <button @click="deleteActivity(act.id)" class="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase tracking-widest">{{ store.t('delete_activity') }}</button>
                     <p class="text-lg font-black italic text-white">{{ act.pace }}</p>
                   </div>
                   <div class="h-10 w-[1px] bg-white/10 hidden sm:block"></div>
@@ -74,7 +74,7 @@
           
           <div v-else class="text-center py-20 opacity-20">
             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-4"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            <p class="text-2xl font-black italic uppercase tracking-tighter">NO ACTIVITIES LOGGED</p>
+            <p class="text-2xl font-black italic uppercase tracking-tighter">{{ store.t('no_activities') }}</p>
           </div>
         </div>
         
@@ -82,7 +82,7 @@
         <div v-else class="flex-1 flex flex-col p-6 md:p-10 overflow-hidden">
            <button @click="backToList" class="self-start mb-6 px-4 py-2 bg-volt/10 border border-volt/30 text-volt hover:bg-volt hover:text-black font-black italic tracking-[0.2em] text-[10px] uppercase flex items-center transition-all group">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-2 transform group-hover:-translate-x-1 transition-transform"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-              BACK TO LOG LIST
+              {{ store.t('back_to_logs') }}
            </button>
            
            <div class="flex justify-between items-end mb-6">
@@ -121,7 +121,7 @@
         <div v-if="isMapFullscreen" class="fixed inset-0 z-[120] bg-black flex flex-col animate-fade-in pt-safe md:pt-0">
            <div class="px-6 py-4 mt-8 md:mt-0 flex justify-between items-center bg-[#0a0a0a] border-b border-white/10 relative z-[200]">
               <div>
-                 <p class="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em] mb-1">REPLAYING SAGA ROUTE</p>
+                 <h3 class="text-[10px] font-bold text-white/40 uppercase tracking-[0.4em] mb-4">{{ store.t('recent_route') }}</h3>
                  <h2 class="text-xl md:text-2xl font-black italic text-volt tracking-tighter uppercase leading-none">{{ selectedActivity.date }}</h2>
               </div>
               <button @click="toggleMapFullscreen" class="w-12 h-12 bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 active:scale-95 transition-all">
@@ -132,15 +132,14 @@
            <div class="relative flex-1 bg-[#111111] isolate">
               <div ref="fullscreenMapContainer" class="absolute inset-0 w-full h-full z-[5]"></div>
               
-              <!-- Map Controls (Iconized for Mobile) -->
-              <div class="absolute bottom-8 right-6 z-[1000] flex flex-col space-y-4">
-                 <button @click="recenterMap" class="w-14 h-14 bg-black/80 backdrop-blur-xl border-2 border-volt text-volt flex items-center justify-center rounded-full shadow-[0_0_20px_rgba(204,255,0,0.3)] hover:bg-volt hover:text-black transition-all active:scale-90">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3"></path><path d="M12 19v3"></path><path d="M2 12h3"></path><path d="M19 12h3"></path></svg>
-                 </button>
-                 
-                 <button @click="toggleMapFullscreen" class="w-14 h-14 bg-volt text-black flex items-center justify-center rounded-full shadow-[0_0_25px_rgba(204,255,0,0.4)] active:scale-90 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"></path><path d="M20 10h-6V4"></path><path d="M14 10l7-7"></path><path d="M3 21l7-7"></path></svg>
-                 </button>
+              <!-- MAP OVERLAY CONTROLS -->
+              <div class="absolute bottom-6 right-6 flex flex-col space-y-3 z-[600]">
+                <button @click.stop="recenterMap" class="w-12 h-12 bg-black border border-volt/50 text-volt rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(204,255,0,0.2)] hover:bg-volt hover:text-black transition-all group" :title="store.t('recenter')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+                <button @click.stop="toggleMapFullscreen" class="w-12 h-12 bg-black border border-white/20 text-white rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all group" :title="store.t('minimize')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg>
+                </button>
               </div>
            </div>
            
@@ -171,6 +170,7 @@
 
 <script setup>
 import { ref, watch, nextTick, onUnmounted } from 'vue';
+import { store } from '../dataStore';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -193,6 +193,12 @@ const cleanupMap = () => {
     mapInstance = null;
   }
   polylineInstance = null;
+};
+
+const deleteActivity = (activityId) => {
+  if (confirm(store.t('delete_confirm'))) {
+    store.deleteActivity(props.runner.id, activityId);
+  }
 };
 
 const selectActivity = async (act) => {
