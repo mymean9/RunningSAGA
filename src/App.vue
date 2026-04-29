@@ -67,6 +67,7 @@ const handleLogout = () => {
 
 .main-app {
   font-family: 'Noto Sans KR', 'Outfit', 'Inter', sans-serif;
+  font-weight: 400;
   background-color: #000000;
   color: white;
   min-height: 100vh;

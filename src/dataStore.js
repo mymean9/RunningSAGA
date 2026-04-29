@@ -54,6 +54,16 @@ export const store = reactive({
   isTrackingActive: false,
   locale: savedLocale,
 
+  initAuth() {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await this._loadUserProfile(user.uid, user.email);
+      } else {
+        this.user = null;
+      }
+    });
+  },
+
   // Translation Dictionary
   translations: {
     ko: {
@@ -325,6 +335,17 @@ const seedDatabase = async () => {
   console.log("Firebase DB Seeded with Defaults!");
 };
 
+// Auth Listener to keep store.user in sync and handle permissions
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("Firebase Auth State: Logged In", user.uid);
+    // You could fetch more detailed runner data here if needed
+  } else {
+    console.log("Firebase Auth State: Logged Out");
+    // store.user = null; // Don't clear immediately to keep localStorage for now
+  }
+});
+
 onSnapshot(runnersCol, (snapshot) => {
   if (snapshot.empty) {
     seedDatabase();
@@ -332,8 +353,11 @@ onSnapshot(runnersCol, (snapshot) => {
     store.runners = snapshot.docs.map(doc => doc.data());
   }
 }, (error) => {
-  alert('DEBUG: RUNNERS ERROR - ' + error.message);
   console.error('FIRESTORE RUNNERS ERROR:', error.message);
+  // If we get permission error, it might be transient or rule-based
+  if (error.code === 'permission-denied') {
+     console.warn("Permission denied. Check Firestore Rules or Auth state.");
+  }
 });
 
 onSnapshot(groupsCol, (snapshot) => {
@@ -341,7 +365,6 @@ onSnapshot(groupsCol, (snapshot) => {
     store.groups = snapshot.docs.map(doc => doc.data());
   }
 }, (error) => {
-  alert('DEBUG: GROUPS ERROR - ' + error.message);
   console.error('FIRESTORE GROUPS ERROR:', error.message);
 });
 
