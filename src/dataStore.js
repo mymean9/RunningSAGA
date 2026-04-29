@@ -356,7 +356,8 @@ const startFirestoreSync = () => {
   
   onSnapshot(runnersCol, (snapshot) => {
     if (snapshot.empty) {
-      seedDatabase();
+      console.log("No runners found in database.");
+      // seedDatabase(); // Disable auto-seeding to avoid permission issues
     } else {
       store.runners = snapshot.docs.map(doc => doc.data());
     }
