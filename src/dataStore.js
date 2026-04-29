@@ -346,26 +346,48 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-onSnapshot(runnersCol, (snapshot) => {
-  if (snapshot.empty) {
-    seedDatabase();
-  } else {
-    store.runners = snapshot.docs.map(doc => doc.data());
-  }
-}, (error) => {
-  console.error('FIRESTORE RUNNERS ERROR:', error.message);
-  // If we get permission error, it might be transient or rule-based
-  if (error.code === 'permission-denied') {
-     console.warn("Permission denied. Check Firestore Rules or Auth state.");
-  }
-});
+let isFirestoreSyncing = false;
 
-onSnapshot(groupsCol, (snapshot) => {
-  if (!snapshot.empty) {
-    store.groups = snapshot.docs.map(doc => doc.data());
+const startFirestoreSync = () => {
+  if (isFirestoreSyncing) return;
+  isFirestoreSyncing = true;
+  
+  console.log("Starting Firestore Real-time Sync...");
+  
+  onSnapshot(runnersCol, (snapshot) => {
+    if (snapshot.empty) {
+      seedDatabase();
+    } else {
+      store.runners = snapshot.docs.map(doc => doc.data());
+    }
+  }, (error) => {
+    console.error('FIRESTORE RUNNERS ERROR:', error.message);
+    if (error.code === 'permission-denied') {
+       console.warn("Permission denied. Ensure you are logged in.");
+    }
+  });
+
+  onSnapshot(groupsCol, (snapshot) => {
+    if (!snapshot.empty) {
+      store.groups = snapshot.docs.map(doc => doc.data());
+    }
+  }, (error) => {
+    console.error('FIRESTORE GROUPS ERROR:', error.message);
+  });
+};
+
+// Auth Listener: The most reliable way to handle authenticated data access
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("Firebase Auth Verified:", user.uid);
+    // Once we are sure user is logged in, start syncing data
+    startFirestoreSync();
+  } else {
+    console.log("Firebase Auth: No active session.");
+    // Even if not logged in, we try to sync (it will fail if rules block it, but that's expected)
+    // If you want to allow guest viewing, change rules to allow read if true
+    startFirestoreSync(); 
   }
-}, (error) => {
-  console.error('FIRESTORE GROUPS ERROR:', error.message);
 });
 
 // Retain active user locally across reloads
