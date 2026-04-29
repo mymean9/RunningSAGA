@@ -100,7 +100,12 @@ export const store = reactive({
 
   // Translation Helper
   t(key) {
-    return this.translations[this.locale][key] || key;
+    try {
+      if (!this.translations || !this.translations[this.locale]) return key;
+      return this.translations[this.locale][key] || key;
+    } catch (e) {
+      return key;
+    }
   },
 
   setLocale(lang) {
@@ -327,6 +332,7 @@ onSnapshot(runnersCol, (snapshot) => {
     store.runners = snapshot.docs.map(doc => doc.data());
   }
 }, (error) => {
+  alert('DEBUG: RUNNERS ERROR - ' + error.message);
   console.error('FIRESTORE RUNNERS ERROR:', error.message);
 });
 
@@ -335,6 +341,7 @@ onSnapshot(groupsCol, (snapshot) => {
     store.groups = snapshot.docs.map(doc => doc.data());
   }
 }, (error) => {
+  alert('DEBUG: GROUPS ERROR - ' + error.message);
   console.error('FIRESTORE GROUPS ERROR:', error.message);
 });
 
