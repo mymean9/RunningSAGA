@@ -132,7 +132,12 @@ export const store = reactive({
       target: '목표',
       total: '합계',
       individual_stakes: '개별 기여도',
-      by_distance: '거리 기준'
+      by_distance: '거리 기준',
+      run: '달리기',
+      compete: '경쟁',
+      dominate: '지배',
+      join_saga_btn: '사가 시작하기',
+      landing_desc: '사가 러닝은 단순한 트래킹을 넘어, 크루원들과의 경쟁을 통해 당신의 한계를 뛰어넘는 경험을 제공합니다.'
     },
     en: {
       your_distance: 'YOUR DISTANCE',
@@ -200,7 +205,12 @@ export const store = reactive({
       target: 'TARGET',
       total: 'TOTAL',
       individual_stakes: 'INDIVIDUAL STAKES',
-      by_distance: 'BY DISTANCE'
+      by_distance: 'BY DISTANCE',
+      run: 'RUN',
+      compete: 'COMPETE',
+      dominate: 'DOMINATE',
+      join_saga_btn: 'JOIN THE SAGA',
+      landing_desc: 'TRANSFORM YOUR RUNS INTO AN EPIC QUEST. TRACK EVERY STRIDE, COMPETE WITH YOUR CREW, AND DOMINATE THE LEADERBOARD.'
     }
   },
 

@@ -1,5 +1,15 @@
 <template>
   <div class="min-h-screen bg-black flex flex-col items-center justify-center relative overflow-hidden px-6">
+    <!-- Lang Switcher inside Modal -->
+    <div class="absolute top-8 right-8 z-50">
+      <button 
+        @click="store.setLocale(store.locale === 'ko' ? 'en' : 'ko')"
+        class="px-3 py-1.5 border border-white/20 text-xs font-black italic hover:bg-white hover:text-black transition-all uppercase tracking-tighter text-white"
+      >
+        {{ store.locale === 'ko' ? 'EN' : 'KR' }}
+      </button>
+    </div>
+
     <!-- Animated background glow -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-volt/5 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
     <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -26,11 +36,11 @@
 
     <!-- Hero Text -->
     <div class="text-center max-w-3xl mb-12">
-      <h1 class="text-6xl sm:text-8xl md:text-[120px] font-black italic tracking-tighter uppercase leading-none text-white mb-6">
-        RUN.<br><span class="text-volt">COMPETE.</span><br>DOMINATE.
+      <h1 class="text-6xl sm:text-8xl md:text-[100px] font-black italic tracking-tighter uppercase leading-none text-white mb-6">
+        {{ store.t('run') }}.<br><span class="text-volt">{{ store.t('compete') }}.</span><br>{{ store.t('dominate') }}.
       </h1>
-      <p class="text-sm md:text-base font-bold uppercase tracking-[0.3em] text-white/40 leading-relaxed max-w-lg mx-auto">
-        THE ULTIMATE SOCIAL RUNNING TRACKER. LOG YOUR RUNS, FORM CREWS, AND RACE TO THE TOP OF YOUR LEADERBOARD.
+      <p class="text-sm md:text-base font-bold uppercase tracking-[0.2em] text-white/40 leading-relaxed max-w-lg mx-auto">
+        {{ store.t('landing_desc') }}
       </p>
     </div>
 
@@ -45,13 +55,13 @@
         @click="$emit('openAuth', 'signup')"
         class="flex-1 bg-volt text-black py-4 font-black italic text-xl uppercase tracking-tighter hover:bg-white transition-all transform hover:scale-[1.03] active:scale-95 shadow-[0_0_40px_rgba(204,255,0,0.2)]"
       >
-        JOIN SAGA
+        {{ store.t('join_saga_btn') }}
       </button>
       <button
         @click="$emit('openAuth', 'login')"
         class="flex-1 border-2 border-white/30 text-white py-4 font-black italic text-xl uppercase tracking-tighter hover:border-white transition-all active:scale-95"
       >
-        LOGIN
+        {{ store.t('login') }}
       </button>
     </div>
 
@@ -61,9 +71,16 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
+import { store } from '../dataStore';
+
 defineEmits(['openAuth']);
 
-const features = ['GPS ROUTE TRACKING', 'REAL-TIME LEADERBOARD', 'VOICE COACHING', 'CREW SYSTEM', 'FIREBASE SYNC'];
+const features = computed(() => 
+  store.locale === 'ko' 
+    ? ['GPS 경로 추적', '실시간 리더보드', '음성 코칭', '크루 시스템', '클라우드 동기화']
+    : ['GPS ROUTE TRACKING', 'REAL-TIME LEADERBOARD', 'VOICE COACHING', 'CREW SYSTEM', 'FIREBASE SYNC']
+);
 </script>
 
 <style scoped>
