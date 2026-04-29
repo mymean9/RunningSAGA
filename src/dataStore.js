@@ -84,7 +84,18 @@ export const store = reactive({
       invalid_code: '유효하지 않은 코드입니다. 다시 확인해주세요.',
       joined_success: '크루에 성공적으로 참가했습니다!',
       leave_confirm: '정말 크루를 탈퇴하시겠습니까? 리더보드 접근 권한을 잃게 됩니다.',
-      km: 'KM'
+      km: 'KM',
+      login: '로그인',
+      signup: '회원가입',
+      email: '이메일 주소',
+      password: '비밀번호',
+      name: '이름',
+      google_login: '구글로 계속하기',
+      no_account: '계정이 없으신가요?',
+      have_account: '이미 계정이 있으신가요?',
+      auth_title: '사가 러닝 시작하기',
+      auth_desc: '안전한 실시간 트래킹과 크루 경쟁을 위해 로그인하세요.',
+      welcome_back: '다시 오신 것을 환영합니다'
     },
     en: {
       your_distance: 'YOUR DISTANCE',
@@ -104,7 +115,18 @@ export const store = reactive({
       invalid_code: 'INVALID CREW CODE. PLEASE CHECK AND TRY AGAIN.',
       joined_success: 'SUCCESSFULLY JOINED THE CREW!',
       leave_confirm: 'ARE YOU SURE YOU WANT TO LEAVE THIS CREW? YOU WILL LOSE ACCESS TO THE CREW LEADERBOARD.',
-      km: 'KM'
+      km: 'KM',
+      login: 'LOGIN',
+      signup: 'SIGN UP',
+      email: 'EMAIL ADDRESS',
+      password: 'PASSWORD',
+      name: 'FULL NAME',
+      google_login: 'CONTINUE WITH GOOGLE',
+      no_account: "Don't have an account?",
+      have_account: 'Already have an account?',
+      auth_title: 'START YOUR SAGA',
+      auth_desc: 'Sign in for secure real-time tracking and crew competition.',
+      welcome_back: 'WELCOME BACK'
     }
   },
 
