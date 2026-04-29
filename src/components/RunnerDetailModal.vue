@@ -132,16 +132,14 @@
            <div class="relative flex-1 bg-[#111111] isolate">
               <div ref="fullscreenMapContainer" class="absolute inset-0 w-full h-full z-[5]"></div>
               
-              <!-- Map Controls -->
-              <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-[1000] flex items-center space-x-4">
-                 <button @click="recenterMap" class="h-14 px-8 bg-black/80 backdrop-blur-xl border-2 border-volt text-volt flex items-center space-x-3 font-black italic tracking-tighter uppercase shadow-[0_0_30px_rgba(204,255,0,0.3)] hover:bg-volt hover:text-black transition-all active:scale-95">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3"></path><path d="M12 19v3"></path><path d="M2 12h3"></path><path d="M19 12h3"></path></svg>
-                    <span class="text-lg">RECENTER ROUTE</span>
+              <!-- Map Controls (Iconized for Mobile) -->
+              <div class="absolute bottom-8 right-6 z-[1000] flex flex-col space-y-4">
+                 <button @click="recenterMap" class="w-14 h-14 bg-black/80 backdrop-blur-xl border-2 border-volt text-volt flex items-center justify-center rounded-full shadow-[0_0_20px_rgba(204,255,0,0.3)] hover:bg-volt hover:text-black transition-all active:scale-90">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3"></path><path d="M12 19v3"></path><path d="M2 12h3"></path><path d="M19 12h3"></path></svg>
                  </button>
                  
-                 <button @click="toggleMapFullscreen" class="h-14 px-8 bg-volt text-black flex items-center space-x-3 font-black italic tracking-tighter uppercase shadow-[0_0_30px_rgba(204,255,0,0.5)] active:scale-95 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"></path><path d="M20 10h-6V4"></path><path d="M14 10l7-7"></path><path d="M3 21l7-7"></path></svg>
-                    <span class="text-lg">MINIMIZE</span>
+                 <button @click="toggleMapFullscreen" class="w-14 h-14 bg-volt text-black flex items-center justify-center rounded-full shadow-[0_0_25px_rgba(204,255,0,0.4)] active:scale-90 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"></path><path d="M20 10h-6V4"></path><path d="M14 10l7-7"></path><path d="M3 21l7-7"></path></svg>
                  </button>
               </div>
            </div>
