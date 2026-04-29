@@ -346,29 +346,27 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-let isFirestoreSyncing = false;
+let runnersUnsubscribe = null;
+let groupsUnsubscribe = null;
 
 const startFirestoreSync = () => {
-  if (isFirestoreSyncing) return;
-  isFirestoreSyncing = true;
+  // Clear existing listeners if any
+  if (runnersUnsubscribe) runnersUnsubscribe();
+  if (groupsUnsubscribe) groupsUnsubscribe();
   
-  console.log("Starting Firestore Real-time Sync...");
+  console.log("Initializing Firestore Sync (Auth State Checked)...");
   
-  onSnapshot(runnersCol, (snapshot) => {
+  runnersUnsubscribe = onSnapshot(runnersCol, (snapshot) => {
     if (snapshot.empty) {
-      console.log("No runners found in database.");
-      // seedDatabase(); // Disable auto-seeding to avoid permission issues
+      console.log("Database is empty.");
     } else {
       store.runners = snapshot.docs.map(doc => doc.data());
     }
   }, (error) => {
     console.error('FIRESTORE RUNNERS ERROR:', error.message);
-    if (error.code === 'permission-denied') {
-       console.warn("Permission denied. Ensure you are logged in.");
-    }
   });
 
-  onSnapshot(groupsCol, (snapshot) => {
+  groupsUnsubscribe = onSnapshot(groupsCol, (snapshot) => {
     if (!snapshot.empty) {
       store.groups = snapshot.docs.map(doc => doc.data());
     }
@@ -380,13 +378,10 @@ const startFirestoreSync = () => {
 // Auth Listener: The most reliable way to handle authenticated data access
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log("Firebase Auth Verified:", user.uid);
-    // Once we are sure user is logged in, start syncing data
+    console.log("Auth State: Logged In", user.uid);
     startFirestoreSync();
   } else {
-    console.log("Firebase Auth: No active session.");
-    // Even if not logged in, we try to sync (it will fail if rules block it, but that's expected)
-    // If you want to allow guest viewing, change rules to allow read if true
+    console.log("Auth State: Logged Out / Guest");
     startFirestoreSync(); 
   }
 });
